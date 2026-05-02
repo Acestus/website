@@ -85,6 +85,7 @@
 (def ^:private contact-links
   [{:label "Email"    :url "mailto:jump@hey.com"                        :icon "✉"}
    {:label "Blog"     :url "/blog"                                      :icon "✍"}
+   {:label "Website"  :url "https://www.acestus.com"                   :icon "🌐"}
    {:label "GitHub"   :url "https://github.com/Acestus"                :icon "⌨"}
    {:label "Mastodon" :url "https://social.linux.pizza/@acestus"        :icon "🐘" :rel "me"}
    {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}])

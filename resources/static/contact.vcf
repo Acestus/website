@@ -4,10 +4,10 @@ FN:William Weeks-Balconi
 N:Weeks-Balconi;William;;;
 TEL;TYPE=CELL:+18178088059
 EMAIL;TYPE=INTERNET:jump@hey.com
-URL;TYPE=WORK:https://world.hey.com/jump
-X-SOCIALPROFILE;TYPE=github:https://github.com/Acestus
+URL;TYPE=WORK:https://www.acestus.com
+X-SOCIALPROFILE;TYPE=github:https://github.com/acestus
 X-SOCIALPROFILE;TYPE=linkedin:https://linkedin.com/in/acestus
-X-SOCIALPROFILE;TYPE=x:https://x.com/acestus5
+X-SOCIALPROFILE;TYPE=mastodon:https://social.linux.pizza/@acestus
 TITLE:AI Platform Engineer
 ORG:Openclaw
 END:VCARD
