@@ -84,7 +84,6 @@
    {:label "GitHub"   :url "https://github.com/Acestus"                :icon "⌨"}
    {:label "Mastodon" :url "https://social.linux.pizza/@acestus"        :icon "🐘" :rel "me"}
    {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}
-   {:label "X"        :url "https://x.com/acestus5"                    :icon "𝕏"}
    {:label "Resume"   :url "/resume"                                    :icon "📄"}])
 
 (defn- link-item [{:keys [label url icon rel]}]
