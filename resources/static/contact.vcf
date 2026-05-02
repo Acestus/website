@@ -8,6 +8,7 @@ URL;TYPE=WORK:https://www.acestus.com
 X-SOCIALPROFILE;TYPE=github:https://github.com/acestus
 X-SOCIALPROFILE;TYPE=linkedin:https://linkedin.com/in/acestus
 X-SOCIALPROFILE;TYPE=mastodon:https://social.linux.pizza/@acestus
+X-SOCIALPROFILE;TYPE=zulip:https://clojurians.zulipchat.com/#user/646697
 TITLE:AI Platform Engineer
 ORG:Openclaw
 END:VCARD
