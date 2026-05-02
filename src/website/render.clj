@@ -19,6 +19,7 @@
        "<a href=\"/\" class=\"site-name\">acestus.com</a>"
        "<nav class=\"site-nav\" aria-label=\"Site navigation\">"
        "<a href=\"/blog\">Blog</a>"
+       "<a href=\"https://www.acestus.com\">Website</a>"
        "<a href=\"/contact\">Contact</a>"
        "</nav>"
        "<button class=\"theme-toggle\" onclick=\"((d)=>{const n="
@@ -71,7 +72,12 @@
                 "<time>" (subs (:date p) 0 10) "</time>"
                 "<p>" (:summary p) "</p>"
                 "</li>")))
-        "</ul>")))
+        "</ul>"
+        "<section class=\"subscribe\">"
+        "<p>Subscribe to get future posts via email "
+        "(or grab the <a href=\"https://world.hey.com/jump/feed.atom\">RSS feed</a>)</p>"
+        "<a class=\"subscribe-btn\" href=\"https://world.hey.com/jump\">Subscribe via email</a>"
+        "</section>")))
 
 (defn post-page [post]
   (page-shell (:title post) (:html post) :toc (toc-html (:toc post))))

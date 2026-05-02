@@ -600,3 +600,10 @@ body {
 .resume-role { font-size: 0.875rem; color: var(--accent); margin-bottom: 0.5rem; }
 .resume-job ul { padding-left: 1.25rem; margin-top: 0.5rem; }
 .resume-job li { margin-bottom: 0.2rem; font-size: 0.9rem; }
+
+/* ── Subscribe section ───────────────────────────────────────── */
+.subscribe { margin-top: 3rem; padding: 2rem 1rem; text-align: center; border-top: 1px solid var(--border); }
+.subscribe p { color: var(--text-muted); margin-bottom: 1.25rem; }
+.subscribe a { color: var(--accent); }
+.subscribe-btn { display: inline-block; padding: 0.6rem 1.5rem; background: var(--accent); color: var(--bg) !important; border-radius: 2rem; font-size: 0.9rem; font-weight: 500; text-decoration: none; }
+.subscribe-btn:hover { opacity: 0.85; }
