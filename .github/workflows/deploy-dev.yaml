@@ -1,0 +1,185 @@
+name: Deploy to dev
+
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: dev
+
+    env:
+      RESOURCE_GROUP_NAME: rg-website-dev
+      TEMPLATE_FILE: infra/website/main.bicep
+      PARAMS_FILE: infra/website/dev/main.dev.bicepparam
+      INFRA_PATH_PREFIX: infra/website/
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ── JVM toolchain ──────────────────────────────────────────────
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Install Clojure CLI
+        uses: DeLaGuardo/setup-clojure@13.2
+        with:
+          cli: latest
+
+      - name: Cache JVM dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.m2/repository
+            ~/.gitlibs
+            ~/.cpcache
+          key: ${{ runner.os }}-jvm-${{ hashFiles('deps.edn') }}
+          restore-keys: |
+            ${{ runner.os }}-jvm-
+
+      - name: Cache uberjar
+        id: jar-cache
+        uses: actions/cache@v4
+        with:
+          path: target/website-0.1.0.jar
+          key: ${{ runner.os }}-jar-${{ hashFiles('deps.edn', 'src/**', 'resources/**') }}
+
+      # ── Azure login ────────────────────────────────────────────────
+      - name: Login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          auth-type: SERVICE_PRINCIPAL
+          audience: api://AzureADTokenExchange
+
+      # ── Ensure resource group exists ───────────────────────────────
+      - name: Ensure resource group
+        run: |
+          az group create \
+            --name "$RESOURCE_GROUP_NAME" \
+            --location southcentralus \
+            --tags ManagedBy=https://github.com/Acestus/website CreatedBy=acestus || true
+
+      # ── Infrastructure ─────────────────────────────────────────────
+      - name: Check for infrastructure changes
+        id: infra_changes
+        env:
+          FN_NAME: func-website-dev-scus-001
+          FN_RG: rg-website-dev
+        run: |
+          # Always deploy infra on first run (function app doesn't exist yet)
+          if ! az functionapp show --name "$FN_NAME" --resource-group "$FN_RG" > /dev/null 2>&1; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          elif git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "^${INFRA_PATH_PREFIX}"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy Bicep template
+        if: steps.infra_changes.outputs.changed == 'true'
+        run: |
+          az stack group create \
+            --name "stack-website-dev" \
+            --resource-group "$RESOURCE_GROUP_NAME" \
+            --template-file "$TEMPLATE_FILE" \
+            --parameters "$PARAMS_FILE" \
+            --action-on-unmanage deleteResources \
+            --deny-settings-mode none \
+            --yes
+
+      # ── Build ──────────────────────────────────────────────────────
+      - name: Build content
+        if: steps.jar-cache.outputs.cache-hit != 'true'
+        run: clojure -X:prep
+
+      - name: Run tests
+        if: steps.jar-cache.outputs.cache-hit != 'true'
+        run: clojure -M:test
+
+      - name: Build uberjar
+        if: steps.jar-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 10
+        run: clojure -T:build uber
+
+      # ── Create deployment archive ──────────────────────────────────
+      - name: Create deployment archive
+        timeout-minutes: 3
+        run: |
+          zip -r deploy.zip \
+            host.json \
+            Health/function.json \
+            Pages/function.json \
+            target/website-0.1.0.jar
+          ls -lh deploy.zip
+
+      # ── Deploy to Azure Functions ──────────────────────────────────
+      - name: Deploy to Azure Functions
+        timeout-minutes: 10
+        env:
+          FN_NAME: func-website-dev-scus-001
+          FN_RG: rg-website-dev
+        run: |
+          az functionapp deployment source config-zip \
+            --name "$FN_NAME" \
+            --resource-group "$FN_RG" \
+            --src deploy.zip \
+            --build-remote false \
+            --timeout 120 || true
+
+      # ── Custom domain SSL (run after CNAME is verified) ────────────
+      - name: Bind managed SSL certificate
+        timeout-minutes: 10
+        env:
+          FN_NAME: func-website-dev-scus-001
+          FN_RG: rg-website-dev
+          CUSTOM_DOMAIN: acestus.com
+        run: |
+          # Uncomment after CNAME is propagated and custom domain is added to the Function App
+          # if host "$CUSTOM_DOMAIN" > /dev/null 2>&1; then
+          #   THUMBPRINT=$(az webapp config ssl create \
+          #     --hostname "$CUSTOM_DOMAIN" \
+          #     --name "$FN_NAME" \
+          #     --resource-group "$FN_RG" \
+          #     --query thumbprint -o tsv 2>/dev/null || true)
+          #   if [ -n "$THUMBPRINT" ]; then
+          #     az webapp config ssl bind \
+          #       --certificate-thumbprint "$THUMBPRINT" \
+          #       --ssl-type SNI \
+          #       --name "$FN_NAME" \
+          #       --resource-group "$FN_RG"
+          #     echo "✅ SSL bound for $CUSTOM_DOMAIN"
+          #   fi
+          # fi
+          echo "SSL binding step pending CNAME propagation"
+
+      - name: Deployment Summary
+        if: always()
+        run: |
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** dev" >> $GITHUB_STEP_SUMMARY
+          echo "**Resource Group:** $RESOURCE_GROUP_NAME" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.infra_changes.outputs.changed }}" == "true" ]; then
+            echo "✅ Infrastructure deployed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ Infrastructure skipped (no changes)" >> $GITHUB_STEP_SUMMARY
+          fi
