@@ -2,6 +2,7 @@ BEGIN:VCARD
 VERSION:3.0
 FN:William Weeks-Balconi
 N:Weeks-Balconi;William;;;
+TEL;TYPE=CELL:+18178088059
 EMAIL;TYPE=INTERNET:jump@hey.com
 URL;TYPE=WORK:https://world.hey.com/jump
 X-SOCIALPROFILE;TYPE=github:https://github.com/Acestus
