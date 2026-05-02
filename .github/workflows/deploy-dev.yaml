@@ -142,31 +142,27 @@ jobs:
             --build-remote false \
             --timeout 120 || true
 
-      # ── Custom domain SSL (run after CNAME is verified) ────────────
-      - name: Bind managed SSL certificate
-        timeout-minutes: 10
-        env:
-          FN_NAME: func-website-dev-scus-001
-          FN_RG: rg-website-dev
-          CUSTOM_DOMAIN: acestus.com
-        run: |
-          # Uncomment after CNAME is propagated and custom domain is added to the Function App
-          # if host "$CUSTOM_DOMAIN" > /dev/null 2>&1; then
-          #   THUMBPRINT=$(az webapp config ssl create \
-          #     --hostname "$CUSTOM_DOMAIN" \
-          #     --name "$FN_NAME" \
-          #     --resource-group "$FN_RG" \
-          #     --query thumbprint -o tsv 2>/dev/null || true)
-          #   if [ -n "$THUMBPRINT" ]; then
-          #     az webapp config ssl bind \
-          #       --certificate-thumbprint "$THUMBPRINT" \
-          #       --ssl-type SNI \
-          #       --name "$FN_NAME" \
-          #       --resource-group "$FN_RG"
-          #     echo "✅ SSL bound for $CUSTOM_DOMAIN"
-          #   fi
-          # fi
-          echo "SSL binding step pending CNAME propagation"
+      # ── Custom domain SSL (pending CNAME propagation — uncomment to activate) ──
+      # - name: Bind managed SSL certificate
+      #   timeout-minutes: 10
+      #   env:
+      #     FN_NAME: func-website-dev-scus-001
+      #     FN_RG: rg-website-dev
+      #     CUSTOM_DOMAIN: acestus.com
+      #   run: |
+      #     THUMBPRINT=$(az webapp config ssl create \
+      #       --hostname "$CUSTOM_DOMAIN" \
+      #       --name "$FN_NAME" \
+      #       --resource-group "$FN_RG" \
+      #       --query thumbprint -o tsv 2>/dev/null || true)
+      #     if [ -n "$THUMBPRINT" ]; then
+      #       az webapp config ssl bind \
+      #         --certificate-thumbprint "$THUMBPRINT" \
+      #         --ssl-type SNI \
+      #         --name "$FN_NAME" \
+      #         --resource-group "$FN_RG"
+      #       echo "✅ SSL bound for $CUSTOM_DOMAIN"
+      #     fi
 
       - name: Deployment Summary
         if: always()

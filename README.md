@@ -29,4 +29,4 @@ clojure -T:build uber
 
 ## Deploy
 
-Pushes to any branch except `main` deploy to Azure Functions Flex Consumption via GitHub Actions.
+Pushes to `main` deploy to Azure Functions Flex Consumption via GitHub Actions.

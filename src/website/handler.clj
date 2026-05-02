@@ -30,6 +30,12 @@
                  (.getBytes (slurp res) StandardCharsets/UTF_8))
     (send-html! exchange 404 (render/not-found-page))))
 
+(defn- send-binary! [^HttpExchange exchange resource-path content-type]
+  (if-let [res (io/resource resource-path)]
+    (with-open [in (io/input-stream res)]
+      (send-bytes! exchange 200 content-type (.readAllBytes in)))
+    (send-html! exchange 404 (render/not-found-page))))
+
 (defn- dispatch [posts ^HttpExchange exchange]
   (let [path (some-> exchange .getRequestURI .getPath
                      (str/replace #"/$" "")
@@ -53,6 +59,9 @@
           (str/ends-with? rel ".css") (send-static! exchange rel "text/css; charset=utf-8")
           (str/ends-with? rel ".js")  (send-static! exchange rel "application/javascript; charset=utf-8")
           (str/ends-with? rel ".vcf") (send-static! exchange rel "text/vcard; charset=utf-8")
+          (str/ends-with? rel ".svg") (send-static! exchange rel "image/svg+xml")
+          (str/ends-with? rel ".png") (send-binary! exchange rel "image/png")
+          (str/ends-with? rel ".jpg") (send-binary! exchange rel "image/jpeg")
           :else (send-html! exchange 404 (render/not-found-page))))
 
       :else (send-html! exchange 404 (render/not-found-page)))))

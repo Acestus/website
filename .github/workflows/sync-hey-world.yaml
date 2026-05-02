@@ -182,11 +182,11 @@ jobs:
 
           for post in posts:
               slug = post["slug"]
-              html = open(f"resources/content/posts/{slug}.html").read()
+              body = post.get("body", "")
               data = json.dumps({
                   "article": {
                       "title":         post["title"],
-                      "body_markdown": html,
+                      "body_markdown": body,
                       "published":     True,
                       "canonical_url": f"{base}/{slug}",
                   }

@@ -15,7 +15,7 @@
   (b/javac {:src-dirs ["src"]
             :class-dir class-dir
             :basis @basis
-            :javac-opts ["-source" "17" "-target" "17"]})
+            :javac-opts ["--release" "21"]})
   (b/compile-clj {:basis @basis
                   :src-dirs ["src"]
                   :class-dir class-dir})

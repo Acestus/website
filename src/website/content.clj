@@ -8,10 +8,9 @@
   []
   (let [manifest (-> (io/resource "content/posts.edn") slurp edn/read-string)]
     (into {}
-          (map (fn [post]
-                 (let [html (-> (io/resource (str "content/posts/" (:slug post) ".html"))
-                                slurp)]
-                   [(:slug post) (assoc post :html html)])))
+          (keep (fn [post]
+                  (when-let [res (io/resource (str "content/posts/" (:slug post) ".html"))]
+                    [(:slug post) (assoc post :html (slurp res))])))
           manifest)))
 
 (defn posts-by-date

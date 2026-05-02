@@ -12,7 +12,9 @@
   (-> builder
       (.header "Strict-Transport-Security" "max-age=31536000; includeSubDomains")
       (.header "X-Content-Type-Options" "nosniff")
-      (.header "X-Frame-Options" "SAMEORIGIN")))
+      (.header "X-Frame-Options" "SAMEORIGIN")
+      (.header "Content-Security-Policy"
+               "default-src 'self'; style-src 'self'; script-src 'unsafe-inline'; img-src 'self' data:; frame-ancestors 'none'")))
 
 (defn- html-response [^HttpRequestMessage request status html]
   (-> (.createResponseBuilder request status)
