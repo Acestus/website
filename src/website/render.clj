@@ -46,7 +46,7 @@
         "<nav class=\"links\" aria-label=\"Site links\">"
         "<a class=\"link-btn\" href=\"/blog\"><span class=\"link-icon\">✍</span><span class=\"link-label\">Blog</span></a>"
         "<a class=\"link-btn\" href=\"/contact\"><span class=\"link-icon\">✉</span><span class=\"link-label\">Contact</span></a>"
-        "<a class=\"link-btn\" href=\"https://github.com/Acestus/website\" rel=\"noopener noreferrer\"><span class=\"link-icon\">⌨</span><span class=\"link-label\">This Site</span></a>"
+        "<a class=\"link-btn\" href=\"https://github.com/Acestus/website\" rel=\"noopener noreferrer\"><span class=\"link-icon\">⌨</span><span class=\"link-label\">Source Code</span></a>"
         "</nav>"
         "</div>")
    :card-layout true))
