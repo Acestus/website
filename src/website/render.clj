@@ -79,18 +79,23 @@
   (page-shell (:title post) (:html post) :toc (toc-html (:toc post))))
 
 (def ^:private contact-links
-  [{:label "Email"    :url "mailto:jump@hey.com"             :icon "✉"}
-   {:label "Blog"     :url "/blog"                           :icon "✍"}
-   {:label "GitHub"   :url "https://github.com/Acestus"      :icon "⌨"}
-   {:label "LinkedIn" :url "https://linkedin.com/in/acestus" :icon "💼"}
-   {:label "X"        :url "https://x.com/acestus5"          :icon "𝕏"}
-   {:label "Resume"   :url "/resume"                         :icon "📄"}])
+  [{:label "Email"    :url "mailto:jump@hey.com"                        :icon "✉"}
+   {:label "Blog"     :url "/blog"                                      :icon "✍"}
+   {:label "GitHub"   :url "https://github.com/Acestus"                :icon "⌨"}
+   {:label "Mastodon" :url "https://social.linux.pizza/@acestus"        :icon "🐘" :rel "me"}
+   {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}
+   {:label "X"        :url "https://x.com/acestus5"                    :icon "𝕏"}
+   {:label "Resume"   :url "/resume"                                    :icon "📄"}])
 
-(defn- link-item [{:keys [label url icon]}]
-  (str "<a class=\"link-btn\" href=\"" url "\""
-       (when (str/starts-with? url "http") " rel=\"noopener noreferrer\"")
-       "><span class=\"link-icon\">" icon "</span>"
-       "<span class=\"link-label\">" label "</span></a>"))
+(defn- link-item [{:keys [label url icon rel]}]
+  (let [rel-val (cond
+                  rel                          (str "noopener noreferrer " rel)
+                  (str/starts-with? url "http") "noopener noreferrer"
+                  :else                        nil)]
+    (str "<a class=\"link-btn\" href=\"" url "\""
+         (when rel-val (str " rel=\"" rel-val "\""))
+         "><span class=\"link-icon\">" icon "</span>"
+         "<span class=\"link-label\">" label "</span></a>")))
 
 (defn contact-page []
   (page-shell
