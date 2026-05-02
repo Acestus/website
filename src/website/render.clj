@@ -105,7 +105,7 @@
   (page-shell
    "Contact"
    (str "<div class=\"card\">"
-        "<div class=\"avatar\" aria-hidden=\"true\">W</div>"
+        "<img class=\"avatar-photo\" src=\"/static/photo.png\" alt=\"William Weeks-Balconi\">"
         "<h1 class=\"card-name\">William Weeks-Balconi</h1>"
         "<p class=\"card-bio\">Husband, father, Christian, historian.<br>"
         "Into Clojure, writing about Infrastructure as Code, building OpenClaw.</p>"
