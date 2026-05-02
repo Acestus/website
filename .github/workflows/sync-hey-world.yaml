@@ -2,7 +2,7 @@ name: Sync Hey World posts
 
 on:
   schedule:
-    - cron: '0 8 * * *'   # 08:00 UTC = 03:00 CT
+    - cron: '33 14 * * *'   # 14:33 UTC = 09:33 CDT
   workflow_dispatch:
 
 permissions:
