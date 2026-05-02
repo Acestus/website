@@ -137,11 +137,21 @@ jobs:
           token  = os.environ["MASTODON_ACCESS_TOKEN"]
           posts  = json.load(open("/tmp/new-posts.json"))
           base   = "https://www.acestus.com/blog"
+          limit  = 500
 
           for p in posts:
-              slug    = p["slug"]
-              title   = p["title"]
-              message = f"New post: {title}\n\n{base}/{slug}"
+              slug   = p["slug"]
+              title  = p["title"]
+              body   = p.get("body", "")
+              footer = f"\n\nOriginally published at {base}/{slug}"
+              header = f"{title}\n\n"
+              room   = limit - len(header) - len(footer) - 1  # -1 for "…"
+              if len(body) > room:
+                  # trim at last space within room
+                  trimmed = body[:room]
+                  cut = trimmed.rfind(" ")
+                  body = (trimmed[:cut] if cut > 0 else trimmed) + "…"
+              message = header + body + footer
               data    = urllib.parse.urlencode({"status": message}).encode()
               req     = urllib.request.Request(
                   "https://social.linux.pizza/api/v1/statuses",
@@ -149,8 +159,8 @@ jobs:
                   headers={"Authorization": f"Bearer {token}"},
               )
               with urllib.request.urlopen(req) as r:
-                  body = json.loads(r.read())
-                  print(f"  ✓ Posted: {body.get('url')}")
+                  body_resp = json.loads(r.read())
+                  print(f"  ✓ Posted: {body_resp.get('url')}")
           EOF
 
       - name: Summary

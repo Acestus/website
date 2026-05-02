@@ -58,11 +58,13 @@
 
 (defn- parse-entry [entry]
   (let [url  (link-href entry)
-        html (xml-text (find-child entry "content"))]
+        html (xml-text (find-child entry "content"))
+        text (strip-tags html)]
     {:slug    (-> url (str/split #"/") last)
      :title   (xml-text (find-child entry "title"))
      :date    (xml-text (find-child entry "published"))
-     :summary (summary html)
+     :summary (truncate text 200)
+     :body    text
      :url     url
      :html    html}))
 
@@ -106,12 +108,19 @@
       (write-manifest! (merge existing (into {} (map (juxt :slug identity) new-posts))))
       (println "  wrote" posts-edn))
     ;; Write new-posts.json for downstream steps (e.g. Mastodon)
-    (let [out (mapv #(select-keys % [:slug :title :url]) new-posts)]
+    (let [esc   (fn [s] (-> (or s "")
+                            (str/replace "\\" "\\\\")
+                            (str/replace "\"" "\\\"")
+                            (str/replace "\n" "\\n")
+                            (str/replace "\r" "")
+                            (str/replace "\t" " ")))
+          items (map (fn [{:keys [slug title body]}]
+                       (str "{\"slug\":\"" (esc slug) "\","
+                            "\"title\":\"" (esc title) "\","
+                            "\"body\":\"" (esc body) "\"}"))
+                     new-posts)]
       (spit "/tmp/new-posts.json"
-            (str "[" (str/join "," (map (fn [{:keys [slug title]}]
-                                          (str "{\"slug\":\"" slug "\","
-                                               "\"title\":\"" (str/replace title "\"" "\\\"") "\"}"))
-                                        out)) "]")))
+            (str "[" (str/join "," items) "]")))
     (println (str "new=" (count new-posts)))))
 
 (-main)
