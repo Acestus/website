@@ -20,7 +20,6 @@
        "<nav class=\"site-nav\" aria-label=\"Site navigation\">"
        "<a href=\"/blog\">Blog</a>"
        "<a href=\"/contact\">Contact</a>"
-       "<a href=\"/resume\">Resume</a>"
        "</nav>"
        "<button class=\"theme-toggle\" onclick=\"((d)=>{const n="
        "d.getAttribute('data-theme')==='dark'?'light':'dark';"
@@ -46,7 +45,6 @@
         "<nav class=\"links\" aria-label=\"Site links\">"
         "<a class=\"link-btn\" href=\"/blog\"><span class=\"link-icon\">✍</span><span class=\"link-label\">Blog</span></a>"
         "<a class=\"link-btn\" href=\"/contact\"><span class=\"link-icon\">✉</span><span class=\"link-label\">Contact</span></a>"
-        "<a class=\"link-btn\" href=\"/resume\"><span class=\"link-icon\">📄</span><span class=\"link-label\">Resume</span></a>"
         "</nav>"
         "</div>")
    :card-layout true))
@@ -83,8 +81,7 @@
    {:label "Blog"     :url "/blog"                                      :icon "✍"}
    {:label "GitHub"   :url "https://github.com/Acestus"                :icon "⌨"}
    {:label "Mastodon" :url "https://social.linux.pizza/@acestus"        :icon "🐘" :rel "me"}
-   {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}
-   {:label "Resume"   :url "/resume"                                    :icon "📄"}])
+   {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}])
 
 (defn- link-item [{:keys [label url icon rel]}]
   (let [rel-val (cond
