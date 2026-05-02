@@ -95,8 +95,8 @@
 
 (defn -main []
   (.mkdirs (io/file posts-dir))
-  (let [existing (load-existing)
-        entries  (fetch-entries)
+  (let [existing  (load-existing)
+        entries   (fetch-entries)
         new-posts (remove #(contains? existing (:slug %)) entries)]
     (println (str (count entries) " in feed, " (count new-posts) " new"))
     (doseq [p new-posts]
@@ -105,6 +105,13 @@
     (when (seq new-posts)
       (write-manifest! (merge existing (into {} (map (juxt :slug identity) new-posts))))
       (println "  wrote" posts-edn))
+    ;; Write new-posts.json for downstream steps (e.g. Mastodon)
+    (let [out (mapv #(select-keys % [:slug :title :url]) new-posts)]
+      (spit "/tmp/new-posts.json"
+            (str "[" (str/join "," (map (fn [{:keys [slug title]}]
+                                          (str "{\"slug\":\"" slug "\","
+                                               "\"title\":\"" (str/replace title "\"" "\\\"") "\"}"))
+                                        out)) "]")))
     (println (str "new=" (count new-posts)))))
 
 (-main)

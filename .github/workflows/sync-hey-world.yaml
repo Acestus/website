@@ -125,6 +125,34 @@ jobs:
             --build-remote false \
             --timeout 120 || true
 
+      # ── Mastodon announcements ─────────────────────────────────────
+      - name: Post to Mastodon
+        if: steps.sync.outputs.new_posts != '0'
+        env:
+          MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+        run: |
+          python3 <<'EOF'
+          import json, urllib.request, urllib.parse, os
+
+          token  = os.environ["MASTODON_ACCESS_TOKEN"]
+          posts  = json.load(open("/tmp/new-posts.json"))
+          base   = "https://www.acestus.com/blog"
+
+          for p in posts:
+              slug    = p["slug"]
+              title   = p["title"]
+              message = f"New post: {title}\n\n{base}/{slug}"
+              data    = urllib.parse.urlencode({"status": message}).encode()
+              req     = urllib.request.Request(
+                  "https://social.linux.pizza/api/v1/statuses",
+                  data=data,
+                  headers={"Authorization": f"Bearer {token}"},
+              )
+              with urllib.request.urlopen(req) as r:
+                  body = json.loads(r.read())
+                  print(f"  ✓ Posted: {body.get('url')}")
+          EOF
+
       - name: Summary
         if: always()
         run: |
