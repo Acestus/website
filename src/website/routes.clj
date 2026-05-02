@@ -36,6 +36,17 @@
         .build)
     (html-response request HttpStatus/NOT_FOUND (render/not-found-page))))
 
+(defn- binary-response [^HttpRequestMessage request resource-path content-type]
+  (if-let [res (io/resource resource-path)]
+    (with-open [in (io/input-stream res)]
+      (let [bytes (.readAllBytes in)]
+        (-> (.createResponseBuilder request HttpStatus/OK)
+            (.header "Content-Type" content-type)
+            with-security-headers
+            (.body bytes)
+            .build)))
+    (html-response request HttpStatus/NOT_FOUND (render/not-found-page))))
+
 (defn handle
   "Route an HTTP request to a response."
   [^HttpRequestMessage request]
@@ -71,6 +82,9 @@
           (str/ends-with? rel ".css") (static-response request rel "text/css; charset=utf-8")
           (str/ends-with? rel ".js")  (static-response request rel "application/javascript; charset=utf-8")
           (str/ends-with? rel ".vcf") (static-response request rel "text/vcard; charset=utf-8")
+          (str/ends-with? rel ".png") (binary-response request rel "image/png")
+          (str/ends-with? rel ".jpg") (binary-response request rel "image/jpeg")
+          (str/ends-with? rel ".svg") (static-response request rel "image/svg+xml")
           :else (html-response request HttpStatus/NOT_FOUND (render/not-found-page))))
 
       :else
