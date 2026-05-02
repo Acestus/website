@@ -64,7 +64,12 @@
 (defn blog-index-page [posts]
   (page-shell
    "Blog"
-   (str "<h1>Posts</h1><ul class=\"post-list\">"
+   (str "<section class=\"subscribe\">"
+        "<p>Subscribe to get future posts via email "
+        "(or grab the <a href=\"https://world.hey.com/jump/feed.atom\">RSS feed</a>)</p>"
+        "<a class=\"subscribe-btn\" href=\"https://world.hey.com/jump\">Subscribe via email</a>"
+        "</section>"
+        "<h1>Posts</h1><ul class=\"post-list\">"
         (str/join
          (for [p (content/posts-by-date posts)]
            (str "<li class=\"post-item\">"
@@ -72,12 +77,7 @@
                 "<time>" (subs (:date p) 0 10) "</time>"
                 "<p>" (:summary p) "</p>"
                 "</li>")))
-        "</ul>"
-        "<section class=\"subscribe\">"
-        "<p>Subscribe to get future posts via email "
-        "(or grab the <a href=\"https://world.hey.com/jump/feed.atom\">RSS feed</a>)</p>"
-        "<a class=\"subscribe-btn\" href=\"https://world.hey.com/jump\">Subscribe via email</a>"
-        "</section>")))
+        "</ul>")))
 
 (defn post-page [post]
   (page-shell (:title post) (:html post) :toc (toc-html (:toc post))))
