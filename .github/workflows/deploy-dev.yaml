@@ -108,10 +108,6 @@ jobs:
             --yes
 
       # ── Build ──────────────────────────────────────────────────────
-      - name: Build content
-        if: steps.jar-cache.outputs.cache-hit != 'true'
-        run: clojure -X:prep
-
       - name: Run tests
         if: steps.jar-cache.outputs.cache-hit != 'true'
         run: clojure -M:test

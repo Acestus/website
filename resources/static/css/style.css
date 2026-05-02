@@ -253,7 +253,8 @@ body {
   margin-bottom: var(--space-xs);
 }
 
-.content p {
+.content p,
+.content .trix-content > div {
   margin-bottom: var(--space-s);
 }
 

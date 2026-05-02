@@ -6,4 +6,3 @@ target/
 .lsp/
 .clj-kondo/.cache/
 local.settings.json
-resources/content/
