@@ -12,9 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Login via OIDC
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          client-id: 560461b1-6b93-4d8e-8d60-b84e38df35ef
-          tenant-id: f81d921a-9cda-470d-a8bd-f12b7a65091c
+          client-id: ${{ vars.CLIENT_ID }}
+          tenant-id: ${{ vars.TENANT_ID }}
+          allow-no-subscriptions: true
       - name: Verify identity
         run: az account show
