@@ -19,7 +19,7 @@
        "<a href=\"/\" class=\"site-name\">acestus.com</a>"
        "<nav class=\"site-nav\" aria-label=\"Site navigation\">"
        "<a href=\"/blog\">Blog</a>"
-       "<a href=\"https://www.acestus.com\">Website</a>"
+       "<a href=\"/portfolio\">Portfolio</a>"
        "<a href=\"/contact\">Contact</a>"
        "</nav>"
        "<button class=\"theme-toggle\" onclick=\"((d)=>{const n="
