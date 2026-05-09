@@ -78,6 +78,15 @@
       (= path "/resume")
       (html-response request HttpStatus/OK (render/resume-page))
 
+      (or (= path "/portfolio") (str/starts-with? path "/portfolio/"))
+      (let [redirect-url "https://portfolio.acestus.com"]
+        (-> (.createResponseBuilder request HttpStatus/FOUND)
+            (.header "Location" (if (= path "/portfolio")
+                                  redirect-url
+                                  (str redirect-url (subs path 10))))
+            with-security-headers
+            .build))
+
       (str/starts-with? path "/static/")
       (let [rel (subs path 1)]
         (cond
