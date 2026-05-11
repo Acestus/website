@@ -112,7 +112,6 @@
         "<p class=\"card-bio\">Husband, father, Christian, historian, builder.<br>"
         "Into Clojure, Microsoft Fabric, and writing about Infrastructure as Code.<br>"
         "I prefer to be contacted by email.</p>"
-        "<a class=\"link-btn\" href=\"https://portfolio.acestus.com\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"link-icon\">🌐</span><span class=\"link-label\">Portfolio</span></a>"
         "<a class=\"add-contact-btn\" href=\"/static/contact.vcf\" download=\"william-weeks-balconi.vcf\">"
         "<span class=\"link-icon\">👤</span>"
         "<span class=\"link-label\">Add to Contacts</span>"
