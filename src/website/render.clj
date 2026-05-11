@@ -44,9 +44,9 @@
         "<p class=\"card-bio\">Husband, father, Christian, historian, builder.<br>"
         "Into Clojure, Microsoft Fabric, and writing about Infrastructure as Code.<br>"
         "I prefer to be contacted by email.</p>"
-        "<a class=\"link-btn\" href=\"/blog\"><span class=\"link-icon\">✍</span><span class=\"link-label\">Blog</span></a>"
         "<a class=\"link-btn\" href=\"https://portfolio.acestus.com\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"link-icon\">🌐</span><span class=\"link-label\">Portfolio</span></a>"
         "<a class=\"link-btn\" href=\"/contact\"><span class=\"link-icon\">✉</span><span class=\"link-label\">Contact</span></a>"
+        "<a class=\"link-btn\" href=\"/blog\"><span class=\"link-icon\">✍</span><span class=\"link-label\">Blog</span></a>"
         "<a class=\"link-btn\" href=\"https://github.com/Acestus/website\" rel=\"noopener noreferrer\"><span class=\"link-icon\">⌨</span><span class=\"link-label\">Source Code</span></a>"
         "</nav>"
         "</div>")
