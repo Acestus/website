@@ -86,15 +86,15 @@
   (page-shell (:title post) (:html post) :toc (toc-html (:toc post))))
 
 (def ^:private contact-links
-  [{:label "Email"    :url "mailto:jump@hey.com"                        :icon "✉"}
-   {:label "Blog"     :url "/blog"                                      :icon "✍"}
-   {:label "Website"  :url "https://www.acestus.com"                   :icon "🌐"}
-   {:label "GitHub"   :url "https://github.com/Acestus"                :icon "⌨"}
-   {:label "Mastodon" :url "https://social.linux.pizza/@acestus"        :icon "🐘" :rel "me"}
-   {:label "Telegram" :url "https://t.me/acestus"                       :icon "✈"}
-   {:label "LinkedIn" :url "https://linkedin.com/in/acestus"           :icon "💼"}])
+  [{:label "Email"    :detail "jump@hey.com"                  :url "mailto:jump@hey.com"                  :icon "✉"}
+   {:label "Blog"     :detail "world.hey.com/jump"            :url "/blog"                                :icon "✍"}
+   {:label "Website"  :detail "acestus.com"                   :url "https://www.acestus.com"              :icon "🌐"}
+   {:label "GitHub"   :detail "github.com/Acestus"            :url "https://github.com/Acestus"           :icon "⌨"}
+   {:label "Mastodon" :detail "@acestus@social.linux.pizza"   :url "https://social.linux.pizza/@acestus"  :icon "🐘" :rel "me"}
+   {:label "Telegram" :detail "t.me/acestus"                  :url "https://t.me/acestus"                 :icon "✈"}
+   {:label "LinkedIn" :detail "linkedin.com/in/acestus"       :url "https://linkedin.com/in/acestus"      :icon "💼"}])
 
-(defn- link-item [{:keys [label url icon rel]}]
+(defn- link-item [{:keys [label detail url icon rel]}]
   (let [rel-val (cond
                   rel                          (str "noopener noreferrer " rel)
                   (str/starts-with? url "http") "noopener noreferrer"
@@ -102,7 +102,10 @@
     (str "<a class=\"link-btn\" href=\"" url "\""
          (when rel-val (str " rel=\"" rel-val "\""))
          "><span class=\"link-icon\">" icon "</span>"
-         "<span class=\"link-label\">" label "</span></a>")))
+         "<span class=\"link-text\">"
+         "<span class=\"link-label\">" label "</span>"
+         "<span class=\"link-detail\">" detail "</span>"
+         "</span></a>")))
 
 (defn contact-page []
   (page-shell

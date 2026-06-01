@@ -574,6 +574,18 @@ body {
   font-size: var(--fs-base);
 }
 
+.link-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.link-detail {
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
 /* ── Site nav ─────────────────────────────────────────────────── */
 .site-nav {
   display: flex;
