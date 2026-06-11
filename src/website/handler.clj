@@ -36,6 +36,14 @@
       (send-bytes! exchange 200 content-type (.readAllBytes in)))
     (send-html! exchange 404 (render/not-found-page))))
 
+(defn- send-doc!
+  "Serve HTML as a Word-compatible .doc download."
+  [^HttpExchange exchange filename html]
+  (.set (.getResponseHeaders exchange) "Content-Disposition"
+        (str "attachment; filename=\"" filename "\""))
+  (send-bytes! exchange 200 "application/msword; charset=utf-8"
+               (.getBytes (str html) StandardCharsets/UTF_8)))
+
 (defn- dispatch [posts ^HttpExchange exchange]
   (let [path (some-> exchange .getRequestURI .getPath
                      (str/replace #"/$" "")
@@ -46,6 +54,8 @@
       (= path "/blog")   (send-html! exchange 200 (render/blog-index-page posts))
       (= path "/contact") (send-html! exchange 200 (render/contact-page))
       (= path "/resume")  (send-html! exchange 200 (render/resume-page))
+      (= path "/resume.doc")
+      (send-doc! exchange "william-weeks-balconi-resume.doc" (render/resume-doc))
 
       (str/starts-with? path "/blog/")
       (let [slug (subs path 6)]

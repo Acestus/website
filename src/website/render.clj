@@ -126,14 +126,11 @@
         "</div>")
    :card-layout true))
 
-(defn resume-page []
-  (page-shell
-   "Resume"
-   (str
+(defn- resume-body
+  "Resume content as HTML — shared between the web page and the Word download."
+  []
+  (str
     "<section class=\"resume\">"
-    "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
-    "<span aria-hidden=\"true\">⬇</span> Download PDF"
-    "</button>"
     "<header class=\"resume-header\">"
     "<h1>William Weeks-Balconi</h1>"
     "<p class=\"resume-title\">Senior Cloud Systems Administrator — Azure, Windows Server &amp; Network Infrastructure</p>"
@@ -257,7 +254,52 @@
     "BS Computer Science &amp; BA History, 2009</p>"
     "</div>"
 
-    "</section>")))
+    "</section>"))
+
+(defn resume-page []
+  (page-shell
+   "Resume"
+   (str
+    "<div class=\"resume-actions\">"
+    "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
+    "<span aria-hidden=\"true\">⬇</span> Download PDF"
+    "</button>"
+    "<a class=\"resume-print\" href=\"/resume.doc\" download=\"william-weeks-balconi-resume.doc\" aria-label=\"Download resume as Word document\">"
+    "<span aria-hidden=\"true\">⬇</span> Download Word"
+    "</a>"
+    "</div>"
+    (resume-body))))
+
+(def ^:private resume-doc-style
+  "Inline styles for the Word download. External CSS isn't followed by Word, so
+   we keep a minimal, print-shaped block right in the HTML."
+  (str
+   "body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #000; max-width: 7.5in; margin: 0.5in auto; }"
+   "h1 { font-size: 18pt; margin: 0 0 0.1in 0; }"
+   "h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.05em; color: #333; border-bottom: 1px solid #999; padding-bottom: 2pt; margin: 0.2in 0 0.1in 0; }"
+   ".resume-title { font-size: 12pt; color: #333; margin: 0 0 0.05in 0; }"
+   ".resume-contact { font-size: 10pt; color: #333; margin: 0 0 0.2in 0; }"
+   ".resume-contact a { color: #000; text-decoration: none; }"
+   ".resume-section { margin-bottom: 0.15in; }"
+   ".resume-job { margin-bottom: 0.15in; }"
+   ".resume-job-header { display: block; }"
+   ".resume-company { font-weight: bold; font-size: 11pt; }"
+   ".resume-dates { float: right; font-size: 10pt; color: #333; }"
+   ".resume-role { font-style: italic; font-size: 10.5pt; color: #333; margin-bottom: 0.05in; }"
+   "ul { margin: 0.05in 0; padding-left: 0.25in; }"
+   "li { margin-bottom: 0.03in; font-size: 10.5pt; }"
+   "strong { font-weight: bold; }"))
+
+(defn resume-doc
+  "Self-contained HTML document Word opens as a .doc file."
+  []
+  (str "<!DOCTYPE html><html lang=\"en\"><head>"
+       "<meta charset=\"utf-8\">"
+       "<title>William Weeks-Balconi — Resume</title>"
+       "<style>" resume-doc-style "</style>"
+       "</head><body>"
+       (resume-body)
+       "</body></html>"))
 
 (defn not-found-page []
   (page-shell "Not Found" "<h1>404</h1><p>Nothing here.</p>"))

@@ -627,10 +627,17 @@ body {
 .subscribe-btn { display: inline-block; padding: 0.6rem 1.5rem; background: var(--accent); color: var(--bg) !important; border-radius: 2rem; font-size: 0.9rem; font-weight: 500; text-decoration: none; }
 .subscribe-btn:hover { opacity: 0.85; }
 
-/* ── Resume: Download PDF button ─────────────────────────────── */
+/* ── Resume: Download buttons ────────────────────────────────── */
+.resume-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
 .resume-print {
-  float: right;
-  margin: 0 0 1rem 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   padding: 0.5rem 1rem;
   background: var(--accent);
   color: var(--bg);
@@ -640,6 +647,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   font-family: inherit;
+  text-decoration: none;
 }
 .resume-print:hover { opacity: 0.85; }
 .resume-print:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -658,7 +666,7 @@ body {
   @page { size: letter; margin: 0.5in; }
 
   /* Hide site chrome */
-  .site-header, .site-footer, .theme-toggle, .resume-print { display: none !important; }
+  .site-header, .site-footer, .theme-toggle, .resume-print, .resume-actions { display: none !important; }
 
   /* Reset layout for print */
   body { background: #fff; color: #000; font-size: 10.5pt; line-height: 1.4; }
