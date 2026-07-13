@@ -90,10 +90,10 @@
                     distinct)]
     (cond
       (= 1 (count found)) (first found)
-      (> (count found) 1) (do (println "  ! multiple tags matched, defaulting to :cloud:" found)
-                              :cloud)
-      :else (do (println "  ! no #blog/#history/#dad tag found, defaulting to :cloud")
-                :cloud))))
+      (> (count found) 1) (do (println "  ! multiple tags matched, defaulting to :history:" found)
+                              :history)
+      :else (do (println "  ! no #blog/#history/#dad tag found, defaulting to :history")
+                :history))))
 
 ;; ── Feed parsing ─────────────────────────────────────────────────────────────
 
