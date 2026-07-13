@@ -19,24 +19,24 @@ jobs:
     timeout-minutes: 30
     environment: dev
 
-    env:
-      RESOURCE_GROUP_NAME: rg-website-dev
-      FN_NAME: func-website-dev-scus-001
-      FN_RG: rg-website-dev
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ── Sync content ───────────────────────────────────────────────
+      - name: Configure git identity and credentials
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global url."https://x-access-token:${{ secrets.BLOG_SYNC_TOKEN }}@github.com/".insteadOf "https://github.com/"
+
       - name: Install Babashka
         run: |
           curl -sL "https://raw.githubusercontent.com/babashka/babashka/master/install" \
             | sudo bash
 
-      - name: Sync Hey World posts
+      - name: Sync Hey World posts (classify + route to blog-cloud / blog-history / blog-christian)
         id: sync
         run: |
           bb scripts/sync-hey-world.bb | tee /tmp/sync-output.txt
@@ -44,86 +44,12 @@ jobs:
           echo "new_posts=$COUNT" >> "$GITHUB_OUTPUT"
           echo "New posts: $COUNT"
 
-      - name: Commit new posts
+      - name: Commit sync state
         if: steps.sync.outputs.new_posts != '0'
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add resources/content/
-          git commit -m "Sync Hey World posts [skip ci]
-
-          $(grep '+' /tmp/sync-output.txt || true)
-
-          Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>"
+          git add .hey-world-synced.edn
+          git commit -m "Update Hey World sync state [skip ci]" || echo "nothing to commit"
           git push
-
-      # ── JVM toolchain ──────────────────────────────────────────────
-      - name: Set up Java 21
-        if: steps.sync.outputs.new_posts != '0'
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-
-      - name: Install Clojure CLI
-        if: steps.sync.outputs.new_posts != '0'
-        uses: DeLaGuardo/setup-clojure@13.2
-        with:
-          cli: latest
-
-      - name: Cache JVM dependencies
-        if: steps.sync.outputs.new_posts != '0'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.m2/repository
-            ~/.gitlibs
-            ~/.cpcache
-          key: ${{ runner.os }}-jvm-${{ hashFiles('deps.edn') }}
-          restore-keys: |
-            ${{ runner.os }}-jvm-
-
-      # ── Azure login ────────────────────────────────────────────────
-      - name: Login with OIDC
-        if: steps.sync.outputs.new_posts != '0'
-        uses: azure/login@v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-          auth-type: SERVICE_PRINCIPAL
-          audience: api://AzureADTokenExchange
-
-      # ── Build ──────────────────────────────────────────────────────
-      - name: Run tests
-        if: steps.sync.outputs.new_posts != '0'
-        run: clojure -M:test
-
-      - name: Build uberjar
-        if: steps.sync.outputs.new_posts != '0'
-        timeout-minutes: 10
-        run: clojure -T:build uber
-
-      # ── Deploy ─────────────────────────────────────────────────────
-      - name: Create deployment archive
-        if: steps.sync.outputs.new_posts != '0'
-        run: |
-          zip -r deploy.zip \
-            host.json \
-            Health/function.json \
-            Pages/function.json \
-            target/website-0.1.0.jar
-
-      - name: Deploy to Azure Functions
-        if: steps.sync.outputs.new_posts != '0'
-        timeout-minutes: 10
-        run: |
-          az functionapp deployment source config-zip \
-            --name "$FN_NAME" \
-            --resource-group "$FN_RG" \
-            --src deploy.zip \
-            --build-remote false \
-            --timeout 120 || true
 
       # ── Mastodon announcements ─────────────────────────────────────
       - name: Post to Mastodon
@@ -136,18 +62,16 @@ jobs:
 
           token  = os.environ["MASTODON_ACCESS_TOKEN"]
           posts  = json.load(open("/tmp/new-posts.json"))
-          base   = "https://www.acestus.com/blog"
           limit  = 500
 
           for p in posts:
-              slug   = p["slug"]
               title  = p["title"]
               body   = p.get("body", "")
-              footer = f"\n\nOriginally published at {base}/{slug}"
+              url    = p.get("url", "")
+              footer = f"\n\nOriginally published at {url}"
               header = f"{title}\n\n"
               room   = limit - len(header) - len(footer) - 1  # -1 for "…"
               if len(body) > room:
-                  # trim at last space within room
                   trimmed = body[:room]
                   cut = trimmed.rfind(" ")
                   body = (trimmed[:cut] if cut > 0 else trimmed) + "…"
@@ -178,17 +102,16 @@ jobs:
               raise SystemExit(0)
 
           posts = json.load(open("/tmp/new-posts.json"))
-          base  = "https://www.acestus.com/blog"
 
           for post in posts:
-              slug = post["slug"]
               body = post.get("body", "")
+              url  = post.get("url", "")
               data = json.dumps({
                   "article": {
                       "title":         post["title"],
                       "body_markdown": body,
                       "published":     True,
-                      "canonical_url": f"{base}/{slug}",
+                      "canonical_url": url,
                   }
               }).encode()
               req = urllib.request.Request(
@@ -201,8 +124,8 @@ jobs:
               )
               with urllib.request.urlopen(req) as r:
                   resp = json.loads(r.read())
-                  url  = resp.get("url", "?")
-                  print(f"  ✓ Dev.to: {url}")
+                  respurl  = resp.get("url", "?")
+                  print(f"  ✓ Dev.to: {respurl}")
           EOF
 
       - name: Summary
@@ -211,7 +134,7 @@ jobs:
           echo "## Sync Summary" >> $GITHUB_STEP_SUMMARY
           echo "**New posts:** ${{ steps.sync.outputs.new_posts }}" >> $GITHUB_STEP_SUMMARY
           if [ "${{ steps.sync.outputs.new_posts }}" != "0" ]; then
-            echo "✅ Deployed to $FN_NAME" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Routed to blog-cloud / blog-history / blog-christian (each deploys via its own CI/CD)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "⏭️ No new posts — skipped deploy" >> $GITHUB_STEP_SUMMARY
+            echo "⏭️ No new posts — nothing to route" >> $GITHUB_STEP_SUMMARY
           fi
