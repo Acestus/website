@@ -63,14 +63,12 @@
       (= path "/health")
       (text-response request HttpStatus/OK "ok")
 
-      (= path "/blog")
-      (html-response request HttpStatus/OK (render/blog-index-page @posts))
-
-      (str/starts-with? path "/blog/")
-      (let [slug (subs path 6)]
-        (if-let [post (get @posts slug)]
-          (html-response request HttpStatus/OK (render/post-page post))
-          (html-response request HttpStatus/NOT_FOUND (render/not-found-page))))
+      (or (= path "/blog") (str/starts-with? path "/blog/"))
+      (let [redirect-url "https://blog.acestus.com"]
+        (-> (.createResponseBuilder request HttpStatus/FOUND)
+            (.header "Location" redirect-url)
+            with-security-headers
+            .build))
 
       (= path "/contact")
       (html-response request HttpStatus/OK (render/contact-page))
