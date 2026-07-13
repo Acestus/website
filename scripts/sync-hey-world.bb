@@ -74,34 +74,26 @@
 
 ;; ── Topic classification ─────────────────────────────────────────────────────
 
-(def keyword-weights
-  {:cloud     ["azure" "cloud" "sre" "reliability" "kubernetes" "devops"
-               "infrastructure" "incident" "architecture" "openclaw" "agent"
-               "automation" "api" "github" "cicd" "ci/cd" "terraform" "docker"
-               "engineering" "pipeline" "deploy" "ai " "artificial intelligence"
-               "llm" "prompt" "workflow" "toolkit" "operator" "server" "code"]
-   :history   ["history" "historian" "primary source" "secondary source"
-               "philosophy" "political" "essay" "civilization" "ideas"
-               "culture" "movie" "film" "star trek" "media" "journalism"
-               "think tank" "rhetoric" "ancient" "empire" "war" "revolution"]
-   :christian ["faith" "catholic" "jesus" "christ" "church" "marriage" "wife"
-               "husband" "son" "daughter" "father" "prayer" "kids" "children"
-               "family" "parenting" "god" "gospel" "mass" "saint" "sacrament"]})
-
-(defn- score [text words]
-  (let [lower (str/lower-case text)]
-    (reduce + (map (fn [w]
-                     (count (re-seq (re-pattern (str "(?i)" (java.util.regex.Pattern/quote w)))
-                                    lower)))
-                   words))))
+;; Deterministic routing: the post must contain one of these explicit
+;; hashtags (anywhere in title or body) to pick its destination blog.
+;; No AI/keyword-scoring guesswork — the tag is the sole source of truth.
+(def tag->category
+  {"#blog"    :cloud      ;; -> blog.acestus.com
+   "#history" :history    ;; -> history.acestus.com
+   "#dad"     :christian}) ;; -> dad.acestus.com
 
 (defn- classify [title body]
-  (let [text (str title " " body)
-        scores (into {} (map (fn [[k words]] [k (score text words)]) keyword-weights))
-        [best-key best-score] (apply max-key val scores)]
-    (if (pos? best-score)
-      best-key
-      :cloud))) ;; default bucket when nothing matches
+  (let [text  (str/lower-case (str title " " body))
+        found (->> tag->category
+                    (filter (fn [[tag _]] (str/includes? text tag)))
+                    (map second)
+                    distinct)]
+    (cond
+      (= 1 (count found)) (first found)
+      (> (count found) 1) (do (println "  ! multiple tags matched, defaulting to :cloud:" found)
+                              :cloud)
+      :else (do (println "  ! no #blog/#history/#dad tag found, defaulting to :cloud")
+                :cloud))))
 
 ;; ── Feed parsing ─────────────────────────────────────────────────────────────
 
