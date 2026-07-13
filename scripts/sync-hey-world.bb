@@ -90,9 +90,9 @@
 
 (defn- score [text words]
   (let [lower (str/lower-case text)]
-    (reduce + (map (fn [w] (count (re-seq (re-pattern (str/lower-case
-                                                        (str "(?i)" (java.util.regex.Pattern/quote w))))
-                                          lower)))
+    (reduce + (map (fn [w]
+                     (count (re-seq (re-pattern (str "(?i)" (java.util.regex.Pattern/quote w)))
+                                    lower)))
                    words))))
 
 (defn- classify [title body]
