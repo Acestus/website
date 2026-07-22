@@ -259,6 +259,28 @@
        "<p>" details "</p>"
        "</div>"))
 
+(defn resume-doc-path [variant]
+  (case variant
+    :ai-platform "/resume/ai-platform-engineer.doc"
+    :sre "/resume/site-reliability-engineer.doc"
+    "/resume.doc"))
+
+(defn resume-download-filename [variant]
+  (case variant
+    :ai-platform "william-weeks-balconi-ai-platform-engineer-resume.doc"
+    :sre "william-weeks-balconi-site-reliability-engineer-resume.doc"
+    "william-weeks-balconi-resume.doc"))
+
+(defn- resume-actions [variant]
+  (str "<div class=\"resume-actions\">"
+       "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
+       "<span aria-hidden=\"true\">⬇</span> Download PDF"
+       "</button>"
+       "<a class=\"resume-print\" href=\"" (resume-doc-path variant) "\" download=\"" (resume-download-filename variant) "\" aria-label=\"Download resume as Word document\">"
+       "<span aria-hidden=\"true\">⬇</span> Download Word"
+       "</a>"
+       "</div>"))
+
 (defn- resume-body
   "Resume content as HTML, shared by the web page and Word download."
   [variant]
@@ -312,15 +334,7 @@
      (page-shell
       title
       (str
-       (when (= variant :platform)
-         (str "<div class=\"resume-actions\">"
-              "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
-              "<span aria-hidden=\"true\">⬇</span> Download PDF"
-              "</button>"
-              "<a class=\"resume-print\" href=\"/resume.doc\" download=\"william-weeks-balconi-resume.doc\" aria-label=\"Download resume as Word document\">"
-              "<span aria-hidden=\"true\">⬇</span> Download Word"
-              "</a>"
-              "</div>"))
+       (resume-actions variant)
        (resume-body variant))))))
 
 (def ^:private resume-doc-style
@@ -345,14 +359,16 @@
 
 (defn resume-doc
   "Self-contained HTML document Word opens as a .doc file."
-  []
-  (str "<!DOCTYPE html><html lang=\"en\"><head>"
-       "<meta charset=\"utf-8\">"
-       "<title>William Weeks-Balconi — Resume</title>"
-       "<style>" resume-doc-style "</style>"
-       "</head><body>"
-       (resume-body :platform)
-       "</body></html>"))
+  ([] (resume-doc :platform))
+  ([variant]
+   (let [{:keys [title]} (get resume-variants variant (:platform resume-variants))]
+     (str "<!DOCTYPE html><html lang=\"en\"><head>"
+          "<meta charset=\"utf-8\">"
+          "<title>William Weeks-Balconi — " title "</title>"
+          "<style>" resume-doc-style "</style>"
+          "</head><body>"
+          (resume-body variant)
+          "</body></html>"))))
 
 (defn not-found-page []
   (page-shell "Not Found" "<h1>404</h1><p>Nothing here.</p>"))

@@ -57,8 +57,11 @@
 
 (deftest resume-test
   (testing "GET /resume returns 200"
-    (let [resp (handle "/resume")]
-      (is (= HttpStatus/OK (.getStatus resp))))))
+    (let [resp (handle "/resume")
+          body (.getBody resp)]
+      (is (= HttpStatus/OK (.getStatus resp)))
+      (is (re-find #"Download PDF" body))
+      (is (re-find #"/resume.doc" body)))))
 
 (deftest ai-platform-resume-test
   (testing "GET /resume/ai-platform-engineer returns AI platform resume"
@@ -66,7 +69,19 @@
           body (.getBody resp)]
       (is (= HttpStatus/OK (.getStatus resp)))
       (is (re-find #"Senior AI Platform Engineer" body))
-      (is (re-find #"Responsible agentic" body)))))
+      (is (re-find #"Responsible agentic" body))
+      (is (re-find #"Download PDF" body))
+      (is (re-find #"/resume/ai-platform-engineer.doc" body)))))
+
+(deftest ai-platform-resume-doc-test
+  (testing "GET /resume/ai-platform-engineer.doc returns AI platform Word document"
+    (let [resp (handle "/resume/ai-platform-engineer.doc")
+          body (.getBody resp)]
+      (is (= HttpStatus/OK (.getStatus resp)))
+      (is (re-find #"application/msword" (.getHeader resp "Content-Type")))
+      (is (re-find #"william-weeks-balconi-ai-platform-engineer-resume.doc"
+                   (.getHeader resp "Content-Disposition")))
+      (is (re-find #"Senior AI Platform Engineer" body)))))
 
 (deftest sre-resume-test
   (testing "GET /resume/site-reliability-engineer returns SRE resume"
@@ -74,7 +89,19 @@
           body (.getBody resp)]
       (is (= HttpStatus/OK (.getStatus resp)))
       (is (re-find #"Site Reliability Engineer" body))
-      (is (re-find #"Incident response" body)))))
+      (is (re-find #"Incident response" body))
+      (is (re-find #"Download PDF" body))
+      (is (re-find #"/resume/site-reliability-engineer.doc" body)))))
+
+(deftest sre-resume-doc-test
+  (testing "GET /resume/site-reliability-engineer.doc returns SRE Word document"
+    (let [resp (handle "/resume/site-reliability-engineer.doc")
+          body (.getBody resp)]
+      (is (= HttpStatus/OK (.getStatus resp)))
+      (is (re-find #"application/msword" (.getHeader resp "Content-Type")))
+      (is (re-find #"william-weeks-balconi-site-reliability-engineer-resume.doc"
+                   (.getHeader resp "Content-Disposition")))
+      (is (re-find #"Site Reliability Engineer" body)))))
 
 (deftest not-found-test
   (testing "unknown route returns 404"
