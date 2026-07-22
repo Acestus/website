@@ -45,9 +45,10 @@
       (is (= "ok" (.getBody resp))))))
 
 (deftest blog-index-test
-  (testing "GET /blog returns 200"
+  (testing "GET /blog redirects to blog.acestus.com"
     (let [resp (handle "/blog")]
-      (is (= HttpStatus/OK (.getStatus resp))))))
+      (is (= HttpStatus/FOUND (.getStatus resp)))
+      (is (= "https://blog.acestus.com" (.getHeader resp "Location"))))))
 
 (deftest contact-test
   (testing "GET /contact returns 200"
@@ -59,20 +60,38 @@
     (let [resp (handle "/resume")]
       (is (= HttpStatus/OK (.getStatus resp))))))
 
+(deftest ai-platform-resume-test
+  (testing "GET /resume/ai-platform-engineer returns AI platform resume"
+    (let [resp (handle "/resume/ai-platform-engineer")
+          body (.getBody resp)]
+      (is (= HttpStatus/OK (.getStatus resp)))
+      (is (re-find #"Senior AI Platform Engineer" body))
+      (is (re-find #"Responsible agentic" body)))))
+
+(deftest sre-resume-test
+  (testing "GET /resume/site-reliability-engineer returns SRE resume"
+    (let [resp (handle "/resume/site-reliability-engineer")
+          body (.getBody resp)]
+      (is (= HttpStatus/OK (.getStatus resp)))
+      (is (re-find #"Site Reliability Engineer" body))
+      (is (re-find #"Incident response" body)))))
+
 (deftest not-found-test
   (testing "unknown route returns 404"
     (let [resp (handle "/does-not-exist")]
       (is (= HttpStatus/NOT_FOUND (.getStatus resp))))))
 
 (deftest blog-post-not-found-test
-  (testing "unknown blog slug returns 404"
+  (testing "blog slugs redirect to blog.acestus.com"
     (let [resp (handle "/blog/no-such-slug")]
-      (is (= HttpStatus/NOT_FOUND (.getStatus resp))))))
+      (is (= HttpStatus/FOUND (.getStatus resp)))
+      (is (= "https://blog.acestus.com" (.getHeader resp "Location"))))))
 
 (deftest trailing-slash-test
-  (testing "trailing slash on /blog/ is normalized and returns 200"
+  (testing "trailing slash on /blog/ is normalized and redirects"
     (let [resp (handle "/blog/")]
-      (is (= HttpStatus/OK (.getStatus resp))))))
+      (is (= HttpStatus/FOUND (.getStatus resp)))
+      (is (= "https://blog.acestus.com" (.getHeader resp "Location"))))))
 
 (deftest security-headers-test
   (testing "HTML responses include all security headers"

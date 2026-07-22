@@ -126,149 +126,202 @@
         "</div>")
    :card-layout true))
 
+(def ^:private resume-contact-html
+  (str "<p class=\"resume-contact\">"
+       "<a href=\"mailto:jump@hey.com\">jump@hey.com</a> &nbsp;·&nbsp; "
+       "<a href=\"https://linkedin.com/in/acestus\">linkedin.com/in/acestus</a>"
+       "</p>"))
+
+(def ^:private resume-experience
+  [{:company "Reprise Financial"
+    :dates "Jun 2024 – Present"
+    :role "Cloud Infrastructure Engineer"
+    :bullets ["Optimize cloud billing, capacity, and cost management for production services"
+              "Build analytic relational databases and Microsoft Fabric data platform components"
+              "Write Infrastructure-as-Code with CI/CD pipelines for repeatable environments"
+              "Support Kubernetes and cloud-native applications across Linux-based operations"
+              "Maintain FedRAMP-aligned controls with SIEM monitoring and technical documentation"
+              "Use AI coding assistants and local automation to accelerate troubleshooting, documentation, and platform buildout"]}
+   {:company "Beretta Holdings"
+    :dates "Dec 2023 – Apr 2024"
+    :role "Senior Azure Architect"
+    :bullets ["Served as SME for Azure, Microsoft 365, and Microsoft Sentinel"
+              "Deployed AKS and migrated on-premises servers to Azure"
+              "Provisioned resources using ARM templates and Bicep Infrastructure as Code"
+              "Designed subnets, VNETs, VPN, and Azure Firewall policy"
+              "Implemented Entra ID with MFA, PIM, and RBAC for governed access"]}
+   {:company "Microsoft"
+    :dates "Jul 2022 – Dec 2023"
+    :role "Cloud Engineer"
+    :bullets ["Supported Azure Kubernetes Service production issues and customer escalations"
+              "Created custom runbooks with PowerShell for Logic Apps and Azure Automation"
+              "Deployed Azure Front Door profiles for CDN, high availability, and traffic routing"
+              "Wrote Kusto queries for Log Analytics, Resource Graph, and Microsoft Sentinel"
+              "Deployed and managed AMA/MMA agents with Data Collection Rules"]}
+   {:company "Stock Technologies"
+    :dates "Mar 2020 – May 2022"
+    :role "Cloud Operations Engineer"
+    :bullets ["Delivered IT consulting for PathAdvantage medical facility"
+              "Maintained Azure AD Connect Sync and hybrid identity workflows"
+              "Migrated healthcare data to Azure with operational safeguards"
+              "Wrote PowerShell scripts for user onboarding automation"]}
+   {:company "Beacon Hill Staffing"
+    :dates "Apr 2017 – Mar 2020"
+    :role "Cloud Administrator"
+    :bullets ["Consulted for 7-Eleven and CBRE"
+              "Managed IaaS, Azure VMs, NSGs, and vulnerability scanning"
+              "Wrote SQL and PowerShell scripts for operations and security"]}])
+
+(def ^:private resume-variants
+  {:platform
+   {:title "Resume"
+    :headline "Platform Engineer — Fabric, Azure &amp; Clojure"
+    :profile "I manage Azure environments with a Linux tech stack. Platform Engineer with 5+ years experience in Microsoft Fabric, Azure infrastructure, IT automation, and cloud services. Specializing in functional programming with Clojure and Infrastructure as Code."
+    :skills [["Data Engineering" "Microsoft Fabric, Lakehouse, OneLake, Data Factory, Synapse pipelines"]
+             ["Cloud Native Deployment" "Kubernetes for Azure and Google Cloud"]
+             ["Network Administration" "Routers and firewalls with Infrastructure as Code"]
+             ["Security &amp; Compliance" "Backup, disaster recovery, RBAC, SIEM, Entra, FedRAMP"]]
+    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
+            "CKA · CCNA · CompTIA Server+"]
+    :experience resume-experience}
+
+   :ai-platform
+   {:title "AI Platform Engineer Resume"
+    :headline "Senior AI Platform Engineer — Responsible Agentic Systems, Cloud Infrastructure &amp; Automation"
+    :profile "Senior platform engineer focused on turning agentic AI into production infrastructure: secure agent runtimes, reusable deployment patterns, CI/CD standardization, governed identity and secrets access, observability, rollback, runbooks, and cost-aware cloud operations. Hands-on with Azure, Kubernetes, GitHub Actions, Infrastructure as Code, Microsoft Fabric, M365 Copilot governance, local/open-source LLM operations, and AI-assisted engineering workflows using Codex, Claude Code, Cursor, Copilot, and OpenClaw-style skills."
+    :skills [["AI Platform Engineering" "Responsible agentic runtime patterns, tool calling, RAG workflows, evaluation loops, guardrails, human approval gates, production readiness standards"]
+             ["AI-Assisted Delivery" "Codex, Claude Code, Cursor, GitHub Copilot, reusable skills, ticket-to-code workflows, automated documentation, troubleshooting, and test generation"]
+             ["Cloud &amp; IaC" "Azure, hybrid cloud, Docker, Kubernetes, AKS, Bicep, Terraform-ready patterns, Helm-style release standardization, GitHub Actions reusable workflows"]
+             ["Security &amp; Identity" "OAuth 2.0, OIDC, SAML, JWT, RBAC, IAM, Entra ID, PIM, workload identity, secrets management, service-to-service access"]
+             ["Operations &amp; Observability" "Incident response, Kusto, Log Analytics, Microsoft Sentinel, SIEM, traces/logs/metrics, rollback, DR, capacity planning, cost optimization"]
+             ["Languages &amp; Automation" "Clojure, ClojureScript, Python, JavaScript, PowerShell, Bash, SQL, Linux, containers, networking"]]
+    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
+            "CKA · CCNA · CompTIA Server+"]
+    :experience
+    [(update (nth resume-experience 0) :bullets
+             (constantly ["Automate cloud platform buildout, release paths, and environment provisioning with Infrastructure as Code and CI/CD"
+                          "Use AI coding tools and OpenClaw/Codex-style skills to automate ticket investigation, documentation, deployment support, and troubleshooting"
+                          "Build Microsoft Fabric and analytic platform components with repeatable operational patterns"
+                          "Support Kubernetes and cloud-native Linux services with monitoring, rollback, and incident response practices"
+                          "Maintain FedRAMP-aligned security posture through SIEM, access control, technical documentation, and audit-ready operations"
+                          "Drive cost, capacity, and reliability tradeoffs for cloud services and data workloads"]))]
+    :projects
+    [{:name "OpenClaw and Codex Skills"
+      :details "Built and operates a local AI-operations environment where agents use skills, tools, shell commands, GitHub, Reminders, Notion, and messaging to complete real work with human approval boundaries and durable memory."}
+     {:name "Workflow Toolkit"
+      :details "Open-source file-driven AI ops pattern with reusable skills, markdown-to-API synchronization, ticket workflows, GitHub Actions, and local SQLite state for auditable handoffs."}
+     {:name "Copilot-Ops Console"
+      :details "Portfolio implementation showing agentic ticket lanes, skill pipelines, voice capture, worklog sync, and operator-in-the-loop automation for production support."}
+     {:name "Agentic Web Portfolio"
+      :details "Explains the production architecture model for API-first agents using REST/GraphQL/CLI, OAuth/OIDC, scoped permissions, and composable tool access instead of brittle custom middleware."}]}
+
+   :sre
+   {:title "Site Reliability Engineer Resume"
+    :headline "Site Reliability Engineer — Cloud Operations, Kubernetes, Observability &amp; Incident Response"
+    :profile "Cloud and site reliability engineer with production experience across Azure, Kubernetes, Linux operations, Infrastructure as Code, monitoring, security, disaster recovery, and cost optimization. Strong at incident response, Kusto investigations, CI/CD, runbooks, rollback planning, hybrid identity, and translating messy production constraints into reliable operating practices."
+    :skills [["Reliability Engineering" "Incident response, monitoring, rollback, disaster recovery, capacity planning, operational readiness, runbooks"]
+             ["Cloud Platforms" "Azure, AKS, Azure Front Door, Azure Automation, Logic Apps, Microsoft Fabric, hybrid cloud operations"]
+             ["Observability &amp; Security" "Log Analytics, Kusto/KQL, Microsoft Sentinel, SIEM, vulnerability scanning, AMA/MMA agents, Data Collection Rules"]
+             ["Infrastructure &amp; Delivery" "Bicep, ARM templates, CI/CD, GitHub Actions, Kubernetes, Docker, Linux, PowerShell, Bash, SQL"]
+             ["Identity &amp; Networking" "Entra ID, MFA, PIM, RBAC, Azure AD Connect, VNETs, subnets, VPN, NSGs, Azure Firewall"]]
+    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
+            "CKA · CCNA · CompTIA Server+"]
+    :experience resume-experience
+    :projects
+    [{:name "Infrastructure as Code Portfolio"
+      :details "Interactive portfolio and articles showing Azure deployment pipelines, Bicep/AVM patterns, GitHub Actions, OIDC, policy governance, and repeatable cloud delivery."}
+     {:name "Log and Operations Portfolio"
+      :details "Operational demos covering KQL, log pipelines, Azure monitoring, incident investigation, and production support practices."}
+     {:name "Fabric Capacity and FinOps Work"
+      :details "Cost and capacity optimization examples for Microsoft Fabric and Azure, including SKU selection, pause/resume strategy, and operational guardrails."}]}})
+
+(defn- html-list [class-name items]
+  (str "<ul" (when-not (str/blank? class-name) (str " class=\"" class-name "\"")) ">"
+       (str/join (for [item items] (str "<li>" item "</li>")))
+       "</ul>"))
+
+(defn- skill-item [[category details]]
+  (str "<strong>" category "</strong> — " details))
+
+(defn- job-html [{:keys [company dates role bullets]}]
+  (str "<div class=\"resume-job\">"
+       "<div class=\"resume-job-header\">"
+       "<span class=\"resume-company\">" company "</span>"
+       "<span class=\"resume-dates\">" dates "</span>"
+       "</div>"
+       "<div class=\"resume-role\">" role "</div>"
+       (html-list "" bullets)
+       "</div>"))
+
+(defn- project-html [{:keys [name details]}]
+  (str "<div class=\"resume-job\">"
+       "<div class=\"resume-role\"><strong>" name "</strong></div>"
+       "<p>" details "</p>"
+       "</div>"))
+
 (defn- resume-body
-  "Resume content as HTML — shared between the web page and the Word download."
-  []
-  (str
-    "<section class=\"resume\">"
-    "<header class=\"resume-header\">"
-    "<h1>William Weeks-Balconi</h1>"
-    "<p class=\"resume-title\">Senior Cloud Systems Administrator — Azure, Windows Server &amp; Network Infrastructure</p>"
-    "<p class=\"resume-contact\">"
-    "<a href=\"mailto:jump@hey.com\">jump@hey.com</a> &nbsp;·&nbsp; "
-    "<a href=\"https://linkedin.com/in/acestus\">linkedin.com/in/acestus</a>"
-    "</p>"
-    "</header>"
+  "Resume content as HTML, shared by the web page and Word download."
+  [variant]
+  (let [{:keys [headline profile skills certs experience projects]}
+        (get resume-variants variant (:platform resume-variants))]
+    (str "<section class=\"resume\">"
+       "<header class=\"resume-header\">"
+       "<h1>William Weeks-Balconi</h1>"
+       "<p class=\"resume-title\">" headline "</p>"
+       resume-contact-html
+       "</header>"
 
-    "<div class=\"resume-section\">"
-    "<h2>Profile</h2>"
-    "<p>Senior cloud systems administrator with 8+ years designing, deploying, and operating secure Microsoft Azure environments alongside Windows Server and hybrid network infrastructure. I run production workloads on Azure VMs, VNETs, NSGs, and load balancers; enforce least-privilege access with Entra ID, RBAC, PIM, and Azure Policy; and keep systems healthy with Azure Monitor, Log Analytics, and Application Insights. I write Infrastructure as Code (Bicep / ARM / Terraform) deployed through OIDC-federated CI/CD, and I treat backup, disaster recovery, and documentation as first-class deliverables. Comfortable translating technical detail for non-technical stakeholders and partnering across developer, security, and network teams.</p>"
-    "</div>"
+       "<div class=\"resume-section\">"
+       "<h2>Profile</h2>"
+       "<p>" profile "</p>"
+       "</div>"
 
-    "<div class=\"resume-section\">"
-    "<h2>Skills</h2>"
-    "<ul class=\"resume-skills\">"
-    "<li><strong>Azure Infrastructure</strong> — Virtual Machines, VNETs, NSGs, Load Balancers, Storage Accounts, Resource Groups, Azure Firewall, Front Door, AKS</li>"
-    "<li><strong>Networking</strong> — TCP/IP, DNS, VPN (Site-to-Site &amp; Point-to-Site), ExpressRoute, on-prem LAN/WAN, firewall policy, network security protocols</li>"
-    "<li><strong>Windows Server &amp; Identity</strong> — Active Directory, Entra ID, Entra Connect Sync, Group Policy, MFA, Conditional Access, PIM, RBAC</li>"
-    "<li><strong>Monitoring &amp; Performance</strong> — Azure Monitor, Log Analytics, Application Insights, KQL, Resource Graph, Microsoft Sentinel, alerting, cost optimization</li>"
-    "<li><strong>Security &amp; Compliance</strong> — Azure Policy, NSGs, vulnerability scanning, SIEM, FedRAMP, backup &amp; disaster recovery, Azure Site Recovery</li>"
-    "<li><strong>Automation &amp; IaC</strong> — Bicep (AVM), ARM, Terraform, PowerShell, Logic Apps, Azure Automation runbooks, GitHub Actions with OIDC</li>"
-    "<li><strong>Data &amp; Database</strong> — Microsoft Fabric, OneLake, Synapse, Azure SQL, relational database administration</li>"
-    "</ul>"
-    "</div>"
+       "<div class=\"resume-section\">"
+       "<h2>Skills</h2>"
+       (html-list "resume-skills" (map skill-item skills))
+       "</div>"
 
-    "<div class=\"resume-section\">"
-    "<h2>Certifications</h2>"
-    "<ul class=\"resume-certs\">"
-    "<li>AZ-500 · AZ-305 · AZ-104 · DP-900</li>"
-    "<li>CKA · CCNA · CompTIA Server+</li>"
-    "</ul>"
-    "</div>"
+       "<div class=\"resume-section\">"
+       "<h2>Certifications</h2>"
+       (html-list "resume-certs" certs)
+       "</div>"
 
-    "<div class=\"resume-section\">"
-    "<h2>Experience</h2>"
+       "<div class=\"resume-section\">"
+       "<h2>Experience</h2>"
+       (apply str (map job-html experience))
+       "</div>"
 
-    "<div class=\"resume-job\">"
-    "<div class=\"resume-job-header\">"
-    "<span class=\"resume-company\">Reprise Financial</span>"
-    "<span class=\"resume-dates\">Jun 2024 – Present</span>"
-    "</div>"
-    "<div class=\"resume-role\">Cloud Infrastructure Engineer</div>"
-    "<ul>"
-    "<li>Operate Azure infrastructure — VMs, VNETs, storage accounts, load balancers, and resource groups — with high availability and FedRAMP compliance</li>"
-    "<li>Author Bicep (AVM) and Terraform Infrastructure as Code deployed through GitHub Actions with OIDC federated identity (no long-lived secrets)</li>"
-    "<li>Build Azure Monitor, Log Analytics, and Application Insights dashboards; write KQL queries to track system health, performance, and cost</li>"
-    "<li>Manage Azure backup, snapshot, and disaster recovery configurations; test restore procedures to validate business continuity</li>"
-    "<li>Enforce security baselines via Azure Policy, NSGs, RBAC, and Microsoft Sentinel SIEM analytics rules</li>"
-    "<li>Optimize cloud spend with right-sizing, reserved instances, and FinOps reporting across Azure, Fabric, and AI Foundry</li>"
-    "<li>Support Kubernetes (AKS) workloads and produce technical documentation and runbooks for the operations team</li>"
-    "</ul>"
-    "</div>"
+       (when (seq projects)
+         (str "<div class=\"resume-section\">"
+              "<h2>Selected Projects</h2>"
+              (apply str (map project-html projects))
+              "</div>"))
 
-    "<div class=\"resume-job\">"
-    "<div class=\"resume-job-header\">"
-    "<span class=\"resume-company\">Beretta Holdings</span>"
-    "<span class=\"resume-dates\">Dec 2023 – Apr 2024</span>"
-    "</div>"
-    "<div class=\"resume-role\">Senior Azure Architect</div>"
-    "<ul>"
-    "<li>Subject matter expert for Azure, Microsoft 365, and Microsoft Sentinel across a multi-region enterprise tenant</li>"
-    "<li>Migrated on-premises Windows Server workloads to Azure VMs and AKS, including Active Directory integration with Entra ID</li>"
-    "<li>Designed and deployed VNETs, subnets, Site-to-Site VPN, and Azure Firewall policy for secure hybrid connectivity</li>"
-    "<li>Provisioned cloud infrastructure with ARM templates and Bicep; codified network security groups and Azure Policy assignments</li>"
-    "<li>Implemented Entra ID hardening — MFA, Conditional Access, Privileged Identity Management (PIM), and role-based access control</li>"
-    "<li>Configured Azure Backup and Azure Site Recovery; documented and tested disaster recovery runbooks</li>"
-    "</ul>"
-    "</div>"
+       "<div class=\"resume-section\">"
+       "<h2>Education</h2>"
+       "<p><strong>Austin College — Sherman, Texas</strong><br>"
+       "BS Computer Science &amp; BA History, 2009</p>"
+       "</div>"
 
-    "<div class=\"resume-job\">"
-    "<div class=\"resume-job-header\">"
-    "<span class=\"resume-company\">Microsoft</span>"
-    "<span class=\"resume-dates\">Jul 2022 – Dec 2023</span>"
-    "</div>"
-    "<div class=\"resume-role\">Cloud Engineer</div>"
-    "<ul>"
-    "<li>Supported Azure customers across compute, networking, identity, and observability — frequently translating technical detail for non-technical stakeholders</li>"
-    "<li>Authored PowerShell runbooks for Azure Automation and Logic Apps to remediate alerts and standardize operations</li>"
-    "<li>Deployed Azure Front Door profiles for CDN, global load balancing, and high availability</li>"
-    "<li>Wrote Kusto (KQL) queries against Log Analytics, Azure Resource Graph, and Sentinel for performance trending and security investigation</li>"
-    "<li>Deployed and tuned Azure Monitor Agent (AMA/MMA) with Data Collection Rules to standardize telemetry across Windows and Linux fleets</li>"
-    "<li>Reviewed NSG, Azure Policy, and Conditional Access configurations during customer engagements</li>"
-    "</ul>"
-    "</div>"
+       "</section>")))
 
-    "<div class=\"resume-job\">"
-    "<div class=\"resume-job-header\">"
-    "<span class=\"resume-company\">Stock Technologies</span>"
-    "<span class=\"resume-dates\">Mar 2020 – May 2022</span>"
-    "</div>"
-    "<div class=\"resume-role\">Cloud Operations Engineer</div>"
-    "<ul>"
-    "<li>Provided IT consulting and Tier 2/3 systems administration for PathAdvantage, a multi-site medical practice</li>"
-    "<li>Maintained Entra Connect (Azure AD Connect) hybrid identity sync between on-prem Active Directory and Microsoft 365</li>"
-    "<li>Migrated regulated healthcare data and Windows Server workloads to Azure with backup and recovery validation</li>"
-    "<li>Automated user on-boarding, off-boarding, and license assignment with PowerShell and Microsoft Graph</li>"
-    "</ul>"
-    "</div>"
-
-    "<div class=\"resume-job\">"
-    "<div class=\"resume-job-header\">"
-    "<span class=\"resume-company\">Beacon Hill Staffing</span>"
-    "<span class=\"resume-dates\">Apr 2017 – Mar 2020</span>"
-    "</div>"
-    "<div class=\"resume-role\">Cloud Administrator</div>"
-    "<ul>"
-    "<li>Cloud and Windows Server administration consulting for 7-Eleven and CBRE enterprise environments</li>"
-    "<li>Managed Azure IaaS — VMs, NSGs, virtual networks, and storage — with regular vulnerability scanning and remediation</li>"
-    "<li>Administered Active Directory, Group Policy, and on-prem network connectivity to Azure</li>"
-    "<li>Wrote SQL and PowerShell automation for daily operations, patching reports, and security compliance</li>"
-    "</ul>"
-    "</div>"
-
-    "</div>"
-
-    "<div class=\"resume-section\">"
-    "<h2>Education</h2>"
-    "<p><strong>Austin College — Sherman, Texas</strong><br>"
-    "BS Computer Science &amp; BA History, 2009</p>"
-    "</div>"
-
-    "</section>"))
-
-(defn resume-page []
-  (page-shell
-   "Resume"
-   (str
-    "<div class=\"resume-actions\">"
-    "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
-    "<span aria-hidden=\"true\">⬇</span> Download PDF"
-    "</button>"
-    "<a class=\"resume-print\" href=\"/resume.doc\" download=\"william-weeks-balconi-resume.doc\" aria-label=\"Download resume as Word document\">"
-    "<span aria-hidden=\"true\">⬇</span> Download Word"
-    "</a>"
-    "</div>"
-    (resume-body))))
+(defn resume-page
+  ([] (resume-page :platform))
+  ([variant]
+   (let [{:keys [title]} (get resume-variants variant (:platform resume-variants))]
+     (page-shell
+      title
+      (str
+       (when (= variant :platform)
+         (str "<div class=\"resume-actions\">"
+              "<button class=\"resume-print\" onclick=\"window.print()\" aria-label=\"Download resume as PDF\">"
+              "<span aria-hidden=\"true\">⬇</span> Download PDF"
+              "</button>"
+              "<a class=\"resume-print\" href=\"/resume.doc\" download=\"william-weeks-balconi-resume.doc\" aria-label=\"Download resume as Word document\">"
+              "<span aria-hidden=\"true\">⬇</span> Download Word"
+              "</a>"
+              "</div>"))
+       (resume-body variant))))))
 
 (def ^:private resume-doc-style
   "Inline styles for the Word download. External CSS isn't followed by Word, so
@@ -298,7 +351,7 @@
        "<title>William Weeks-Balconi — Resume</title>"
        "<style>" resume-doc-style "</style>"
        "</head><body>"
-       (resume-body)
+       (resume-body :platform)
        "</body></html>"))
 
 (defn not-found-page []

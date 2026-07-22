@@ -11,6 +11,8 @@ Unified blog, contact, and resume site — Clojure + Azure Functions Flex Consum
 | `GET /blog/:slug` | Individual blog post |
 | `GET /contact` | Contact / linktree card |
 | `GET /resume` | Resume |
+| `GET /resume/ai-platform-engineer` | AI platform engineer resume |
+| `GET /resume/site-reliability-engineer` | Site reliability engineer resume |
 | `GET /static/*` | Static assets |
 | `GET /health` | Health check |
 

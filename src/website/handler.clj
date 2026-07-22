@@ -56,6 +56,8 @@
       (= path "/resume")  (send-html! exchange 200 (render/resume-page))
       (= path "/resume.doc")
       (send-doc! exchange "william-weeks-balconi-resume.doc" (render/resume-doc))
+      (= path "/resume/ai-platform-engineer") (send-html! exchange 200 (render/resume-page :ai-platform))
+      (= path "/resume/site-reliability-engineer") (send-html! exchange 200 (render/resume-page :sre))
 
       (str/starts-with? path "/blog/")
       (let [slug (subs path 6)]
