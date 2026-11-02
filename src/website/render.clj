@@ -175,8 +175,8 @@
 (def ^:private resume-variants
   {:platform
    {:title "Resume"
-    :headline "Platform Engineer — Fabric, Azure &amp; Clojure"
-    :profile "I manage Azure environments with a Linux tech stack. Platform Engineer with 5+ years experience in Microsoft Fabric, Azure infrastructure, IT automation, and cloud services. Specializing in functional programming with Clojure and Infrastructure as Code."
+    :headline "AI Platform Engineer — Azure, Fabric &amp; .NET"
+    :profile "AI Platform Engineer with 5+ years of experience building and operating Azure infrastructure, Microsoft Fabric data platforms, IT automation, and cloud services. I specialize in .NET, AI-assisted engineering, secure platform operations, and Infrastructure as Code."
     :skills [["Data Engineering" "Microsoft Fabric, Lakehouse, OneLake, Data Factory, Synapse pipelines"]
              ["Cloud Native Deployment" "Kubernetes for Azure and Google Cloud"]
              ["Network Administration" "Routers and firewalls with Infrastructure as Code"]
