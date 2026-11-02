@@ -181,8 +181,8 @@
              ["Cloud Native Deployment" "Kubernetes for Azure and Google Cloud"]
              ["Network Administration" "Routers and firewalls with Infrastructure as Code"]
              ["Security &amp; Compliance" "Backup, disaster recovery, RBAC, SIEM, Entra, FedRAMP"]]
-    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
-            "CKA · CCNA · CompTIA Server+"]
+    :certs ["AZ-104 · AZ-305 · AZ-900"
+            "CCNA · CompTIA Server+"]
     :experience resume-experience}
 
    :ai-platform
@@ -195,8 +195,8 @@
              ["Security &amp; Identity" "OAuth 2.0, OIDC, SAML, JWT, RBAC, IAM, Entra ID, PIM, workload identity, secrets management, service-to-service access"]
              ["Operations &amp; Observability" "Incident response, Kusto, Log Analytics, Microsoft Sentinel, SIEM, traces/logs/metrics, rollback, DR, capacity planning, cost optimization"]
              ["Languages &amp; Automation" "Clojure, ClojureScript, Python, JavaScript, PowerShell, Bash, SQL, Linux, containers, networking"]]
-    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
-            "CKA · CCNA · CompTIA Server+"]
+    :certs ["AZ-104 · AZ-305 · AZ-900"
+            "CCNA · CompTIA Server+"]
     :experience
     [(update (nth resume-experience 0) :bullets
              (constantly ["Automate cloud platform buildout, release paths, and environment provisioning with Infrastructure as Code and CI/CD"
@@ -224,8 +224,8 @@
              ["Observability &amp; Security" "Log Analytics, Kusto/KQL, Microsoft Sentinel, SIEM, vulnerability scanning, AMA/MMA agents, Data Collection Rules"]
              ["Infrastructure &amp; Delivery" "Bicep, ARM templates, CI/CD, GitHub Actions, Kubernetes, Docker, Linux, PowerShell, Bash, SQL"]
              ["Identity &amp; Networking" "Entra ID, MFA, PIM, RBAC, Azure AD Connect, VNETs, subnets, VPN, NSGs, Azure Firewall"]]
-    :certs ["AZ-500 · AZ-305 · AZ-104 · DP-900"
-            "CKA · CCNA · CompTIA Server+"]
+    :certs ["AZ-104 · AZ-305 · AZ-900"
+            "CCNA · CompTIA Server+"]
     :experience resume-experience
     :projects
     [{:name "Infrastructure as Code Portfolio"
