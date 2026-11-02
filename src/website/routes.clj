@@ -49,6 +49,16 @@
             .build)))
     (html-response request HttpStatus/NOT_FOUND (render/not-found-page))))
 
+(defn- doc-response
+  "Serve HTML as a Word-compatible .doc attachment."
+  [^HttpRequestMessage request filename html]
+  (-> (.createResponseBuilder request HttpStatus/OK)
+      (.header "Content-Type" "application/msword; charset=utf-8")
+      (.header "Content-Disposition" (str "attachment; filename=\"" filename "\""))
+      with-security-headers
+      (.body html)
+      .build))
+
 (defn handle
   "Route an HTTP request to a response."
   [^HttpRequestMessage request]
@@ -75,6 +85,25 @@
 
       (= path "/resume")
       (html-response request HttpStatus/OK (render/resume-page))
+
+      (= path "/resume.doc")
+      (doc-response request "william-weeks-balconi-resume.doc" (render/resume-doc))
+
+      (= path "/resume/ai-platform-engineer")
+      (html-response request HttpStatus/OK (render/resume-page :ai-platform))
+
+      (= path "/resume/ai-platform-engineer.doc")
+      (doc-response request
+                    (render/resume-download-filename :ai-platform)
+                    (render/resume-doc :ai-platform))
+
+      (= path "/resume/site-reliability-engineer")
+      (html-response request HttpStatus/OK (render/resume-page :sre))
+
+      (= path "/resume/site-reliability-engineer.doc")
+      (doc-response request
+                    (render/resume-download-filename :sre)
+                    (render/resume-doc :sre))
 
       (or (= path "/portfolio") (str/starts-with? path "/portfolio/"))
       (let [redirect-url "https://portfolio.acestus.com"]

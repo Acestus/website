@@ -21,15 +21,20 @@ jobs:
 
     env:
       RESOURCE_GROUP_NAME: rg-website-dev
-      TEMPLATE_FILE: infra/website/main.bicep
-      PARAMS_FILE: infra/website/dev/main.dev.bicepparam
-      INFRA_PATH_PREFIX: infra/website/
+      TEMPLATE_FILE: acestus-iac/stacks-bicep/rg-website-dev/main.bicep
+      PARAMS_FILE: acestus-iac/stacks-bicep/rg-website-dev/main.bicepparam
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Checkout infrastructure repository
+        uses: actions/checkout@v4
+        with:
+          repository: Acestus/acestus-iac
+          path: acestus-iac
 
       # ── JVM toolchain ──────────────────────────────────────────────
       - name: Set up Java 21
@@ -82,18 +87,9 @@ jobs:
       # ── Infrastructure ─────────────────────────────────────────────
       - name: Check for infrastructure changes
         id: infra_changes
-        env:
-          FN_NAME: func-website-dev-scus-001
-          FN_RG: rg-website-dev
         run: |
-          # Always deploy infra on first run (function app doesn't exist yet)
-          if ! az functionapp show --name "$FN_NAME" --resource-group "$FN_RG" > /dev/null 2>&1; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          elif git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "^${INFRA_PATH_PREFIX}"; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
+          # Infra is centralized in acestus-iac, so deploy it on every run.
+          echo "changed=true" >> $GITHUB_OUTPUT
 
       - name: Deploy Bicep template
         if: steps.infra_changes.outputs.changed == 'true'
