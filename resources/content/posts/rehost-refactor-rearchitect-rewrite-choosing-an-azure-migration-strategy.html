@@ -1,0 +1,120 @@
+<div class="trix-content">
+  <div>
+    <p>Cloud migration conversations often collapse four very different decisions into one word: <em>migration</em>. In Azure architecture work—especially the kind covered by AZ-305—the important question is not simply whether a workload can move. It is what must change, what must remain stable, and what evidence will tell us that the change worked.</p>
+
+    <p>Four strategies provide a useful vocabulary: <strong>rehost</strong>, <strong>refactor</strong>, <strong>re-architect</strong>, and <strong>rewrite</strong>. They are not a ladder where rewrite is automatically the most mature answer. They are different levels of intervention, risk, and expected benefit.</p>
+
+    <h2>Start with the workload, not the preferred technology</h2>
+    <p>AZ-305 encourages architects to reason from business and technical requirements: reliability, security, performance, operations, cost, and time to value. Those requirements should drive the migration strategy. A team that begins with “we need Kubernetes” or “we should rewrite this in .NET” has already skipped the architectural decision.</p>
+
+    <p>Before choosing a path, establish a baseline:</p>
+    <ul>
+      <li>What business capability does the workload provide?</li>
+      <li>What are its dependencies, data flows, identity requirements, and failure modes?</li>
+      <li>Which quality attributes are failing today, and which are already acceptable?</li>
+      <li>What downtime, data-loss, compliance, and rollback constraints apply?</li>
+      <li>How will we prove that the migrated workload is equivalent or better?</li>
+    </ul>
+
+    <p>That last question is the one teams neglect most often. A successful deployment is not the same thing as a successful migration. We need an observable acceptance contract: representative requests, data checks, performance expectations, security controls, operational signals, and a rollback procedure.</p>
+
+    <h2>Rehost: move the workload with minimal change</h2>
+    <p><strong>Rehosting</strong>, often called “lift and shift,” moves the workload to Azure while preserving most of its application and runtime design. An on-premises virtual machine may move to Azure Virtual Machines. A database may move to a compatible managed or hosted database with few application changes.</p>
+
+    <p>Rehost when the main objective is speed, datacenter exit, capacity, or a low-risk first step. It is often the right answer when the application is stable, the migration deadline is real, and the organization needs to establish a cloud landing zone before pursuing deeper modernization.</p>
+
+    <p>Rehosting is not free of architecture work. The surrounding platform still needs deliberate design:</p>
+    <ul>
+      <li>Place workloads in the correct subscription, resource group, region, and network boundary.</li>
+      <li>Use managed identity, RBAC, private connectivity, encryption, backup, and monitoring where appropriate.</li>
+      <li>Define availability and disaster-recovery expectations rather than assuming Azure makes them automatic.</li>
+      <li>Measure cost after migration; an oversized virtual machine is still oversized in Azure.</li>
+    </ul>
+
+    <p>The main risk is preserving an operational problem while changing its hosting location. Rehost is a valid strategy when that tradeoff is explicit. It becomes a mistake when “minimal application change” is confused with “no design required.”</p>
+
+    <h2>Refactor: change the implementation without changing the product</h2>
+    <p><strong>Refactoring</strong> changes the internals of the application while preserving its externally visible behavior. The goal is usually to improve maintainability, testability, deployment, or operational efficiency without changing the business capability itself.</p>
+
+    <p>Examples include:</p>
+    <ul>
+      <li>Breaking a monolith into clearer modules while keeping one deployable application.</li>
+      <li>Replacing local file storage with Azure Blob Storage behind the same application interface.</li>
+      <li>Moving configuration and secrets out of code and into managed services.</li>
+      <li>Adding health checks, structured logging, telemetry, automated tests, and repeatable deployment.</li>
+      <li>Replacing a self-managed database component with an Azure-managed equivalent while preserving the data model.</li>
+    </ul>
+
+    <p>Refactoring is a strong choice when the application is valuable but its current structure makes reliable delivery difficult. It can reduce technical friction without taking on the full domain and integration risk of a new architecture.</p>
+
+    <p>The discipline is to keep the boundary honest. If the team changes the data model, communication patterns, consistency model, or user-facing behavior, the work may have crossed into re-architecture. That is not bad, but it should be named and planned as such.</p>
+
+    <h2>Re-architect: change the structure to meet new requirements</h2>
+    <p><strong>Re-architecting</strong> changes the system’s fundamental architecture so it can meet requirements the current design cannot satisfy. The motivation is usually a quality attribute: elastic scale, regional resilience, stronger isolation, lower latency, independent deployment, or a new integration model.</p>
+
+    <p>A re-architecture might introduce asynchronous messaging, separate read and write models, independently scalable services, event-driven processing, containers, or a different data-partitioning strategy. Azure services can support these designs, but the service list is not the architecture. The architecture is the set of responsibilities, boundaries, dependencies, and guarantees.</p>
+
+    <p>Re-architecting deserves a staged migration plan:</p>
+    <ol>
+      <li>Define the target capabilities and the constraints that justify the change.</li>
+      <li>Choose a seam between the existing system and the new components.</li>
+      <li>Move one slice of behavior or data at a time.</li>
+      <li>Run old and new paths with controlled comparison where necessary.</li>
+      <li>Measure the target quality attributes before retiring the old path.</li>
+    </ol>
+
+    <p>This is where evolutionary architecture matters. Architecture should be allowed to improve incrementally, with fitness functions that detect drift. Useful fitness functions might measure deployment frequency, error rate, recovery time, policy compliance, data freshness, or cost per workload. They turn architectural intent into something the delivery system can repeatedly check.</p>
+
+    <h2>Rewrite: replace the system deliberately</h2>
+    <p><strong>Rewriting</strong> builds a replacement rather than adapting the existing implementation. It may be justified when the current code is effectively unmaintainable, the platform is obsolete, the licensing model is untenable, or the business needs are different enough that preserving the old design creates more risk than starting over.</p>
+
+    <p>Rewrite is the strategy with the largest apparent freedom and the largest hidden risk. The existing system contains undocumented behavior, edge cases, data assumptions, operational workarounds, and user knowledge. A rewrite removes the implementation, but it does not remove those responsibilities.</p>
+
+    <p>A rewrite should therefore begin with discovery and characterization, not an empty repository:</p>
+    <ul>
+      <li>Record actual workflows and important exception paths.</li>
+      <li>Inventory integrations, scheduled jobs, reports, exports, and identity flows.</li>
+      <li>Capture representative data and define migration and reconciliation rules.</li>
+      <li>Build contract, acceptance, and performance tests around behavior that matters.</li>
+      <li>Define coexistence, cutover, rollback, and support plans before the replacement is complete.</li>
+    </ul>
+
+    <p>“We will know what the old application did when we replace it” is not a migration strategy. It is a discovery plan with an alarming production date.</p>
+
+    <h2>A practical decision matrix</h2>
+    <table>
+      <thead><tr><th>Strategy</th><th>Primary change</th><th>Best fit</th><th>Main risk</th></tr></thead>
+      <tbody>
+        <tr><td>Rehost</td><td>Hosting location</td><td>Fast relocation, datacenter exit, stable workload</td><td>Cloud-hosted technical debt and avoidable cost</td></tr>
+        <tr><td>Refactor</td><td>Implementation and operations</td><td>Valuable application constrained by maintainability</td><td>Scope expands into architecture change</td></tr>
+        <tr><td>Re-architect</td><td>System structure and quality attributes</td><td>New scale, resilience, isolation, or integration requirements</td><td>Distributed-system complexity and migration seams</td></tr>
+        <tr><td>Rewrite</td><td>Entire implementation</td><td>Obsolete or unmaintainable system with a justified replacement case</td><td>Lost behavior, underestimated scope, and long coexistence</td></tr>
+      </tbody>
+    </table>
+
+    <h2>The strategy can change by component</h2>
+    <p>A real portfolio rarely has one migration strategy. The application tier may be refactored, the database rehosted temporarily, a reporting subsystem re-architected, and a small obsolete utility rewritten. Treating the whole workload as one indivisible unit forces an unnecessarily expensive decision.</p>
+
+    <p>Map the system by capability and dependency. For each component, record the selected strategy, the reason, the target Azure service or runtime, the owner, the acceptance checks, and the rollback path. This makes the migration reviewable instead of turning it into a slogan.</p>
+
+    <h2>Source of truth and delivery evidence</h2>
+    <p>Migration work also needs a delivery architecture. Infrastructure, application configuration, policies, and target inventories should have explicit sources of truth. A local note, a cloud portal setting, and a generated artifact are not interchangeable.</p>
+
+    <p>A reliable migration path should make these facts visible:</p>
+    <ul>
+      <li>Which source revision produced the candidate.</li>
+      <li>Which tests and acceptance checks passed.</li>
+      <li>Which exact package or artifact was deployed.</li>
+      <li>Which identity performed the operation and what it was allowed to change.</li>
+      <li>Which live checks confirmed the result.</li>
+      <li>What can be redeployed if the cutover fails.</li>
+    </ul>
+
+    <p>Build once, retain the exact tested bytes, and promote those bytes rather than rebuilding at every stage. Keep application publication separate from infrastructure reconciliation. Keep deployment credentials separate from runtime identities. These are not bureaucratic details; they are how an architect preserves causality when a migration behaves unexpectedly.</p>
+
+    <h2>My default recommendation</h2>
+    <p>When the evidence is incomplete, start with the smallest reversible move that creates better evidence. That may be a rehost into a properly governed landing zone, followed by refactoring behind stable interfaces. If the workload has a clear architectural constraint, introduce a seam and re-architect one capability at a time. Reserve a rewrite for a case where discovery, behavior coverage, data migration, coexistence, and rollback are all funded parts of the work.</p>
+
+    <p>The best AZ-305 answer is rarely the most fashionable Azure service or the most ambitious modernization plan. It is the strategy that matches the requirement, makes risk explicit, preserves a way back, and produces evidence that the new architecture is actually better.</p>
+  </div>
+</div>

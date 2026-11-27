@@ -53,6 +53,7 @@ function pageShell(title: string, body: string, options: { toc?: string; cardLay
       <nav class="site-nav" aria-label="Site navigation">
         <a href="/blog">Blog</a>
         <a href="/portfolio">Portfolio</a>
+        <a href="/docs/azure-tour">Docs</a>
         <a href="/contact">Contact</a>
         <a href="/resume">Resume</a>
       </nav>
@@ -223,6 +224,275 @@ function landingPage(): string {
   );
 }
 
+function azureTourPage(): string {
+  const code = (value: string) => `<pre><code>${escapeHtml(value.trim())}</code></pre>`;
+  const section = (id: string, title: string, body: string) => `<h2 id="${id}">${title}</h2>${body}`;
+  const toc = `<nav class="toc" aria-label="Table of contents">
+    <h2 class="toc-title">On this page</h2>
+    <ol>
+      <li><a href="#setup">Setup</a></li>
+      <li><a href="#inventory">Inventory</a></li>
+      <li><a href="#aks">AKS</a></li>
+      <li><a href="#functions">Functions</a></li>
+      <li><a href="#network">Network</a></li>
+      <li><a href="#edge">Load balancing</a></li>
+      <li><a href="#data">Storage and SQL MI</a></li>
+      <li><a href="#observability">Observability</a></li>
+      <li><a href="#changes">Change history</a></li>
+      <li><a href="#billing">Billing and cost</a></li>
+      <li><a href="#governance">Governance</a></li>
+    </ol>
+  </nav>`;
+
+  return pageShell(
+    "Azure resource tour",
+    `<p class="breadcrumbs"><a href="/">Home</a><span class="separator">/</span>Docs<span class="separator">/</span>Azure tour</p>
+    <h1>Azure resource tour</h1>
+    <p class="lead">A read-only PowerShell walkthrough for getting oriented in an Azure subscription. The commands are intentionally shaped for a terminal: concise objects, useful properties, and <code>Format-Table -AutoSize</code> wherever a table makes sense.</p>
+    <div class="panel panel-info"><strong>Before you begin:</strong> these commands inspect configuration and metadata. They do not retrieve secret values or change Azure resources. Run them from PowerShell with the Az module installed.</div>
+    ${section("setup", "1. Connect and choose a subscription", `<p>Install the module once, sign in, then select the subscription you want to tour.</p>${code(`Install-Module Az -Scope CurrentUser -Repository PSGallery -Force
+Connect-AzAccount
+
+Get-AzSubscription |
+    Select-Object Name, Id, State, TenantId |
+    Format-Table -AutoSize
+
+$subscription = "<subscription-id-or-name>"
+Set-AzContext -Subscription $subscription
+
+# Optional: limit the tour to one resource group
+$resourceGroup = $null # or "<resource-group-name>"`)}`)}
+    ${section("inventory", "2. Start with the resource inventory", `<p>This gives you the shape of the subscription before you dive into individual services.</p>${code(`Get-AzResource |
+    Sort-Object ResourceGroupName, ResourceType, Name |
+    Select-Object ResourceGroupName, ResourceType, Name, Location |
+    Format-Table -AutoSize
+
+Get-AzResource |
+    Group-Object ResourceType |
+    Sort-Object Count -Descending |
+    Select-Object Count, Name |
+    Format-Table -AutoSize
+
+Get-AzResourceGroup |
+    Select-Object ResourceGroupName, Location, ProvisioningState |
+    Format-Table -AutoSize`)}`)}
+    ${section("aks", "3. AKS clusters and node pools", `<p>Look for Kubernetes version, power state, networking, identity, and the managed node resource group.</p>${code(`$aks = if ($resourceGroup) {
+    Get-AzAks -ResourceGroupName $resourceGroup
+} else {
+    Get-AzAks
+}
+
+$aks |
+    Select-Object Name, ResourceGroupName, Location, KubernetesVersion,
+        ProvisioningState, PowerState, Fqdn, NodeResourceGroup |
+    Format-Table -AutoSize
+
+foreach ($cluster in $aks) {
+    Write-Host "\`n=== AKS: $($cluster.Name) ===" -ForegroundColor Cyan
+    Get-AzAksNodePool -ResourceGroupName $cluster.ResourceGroupName \\
+        -ClusterName $cluster.Name |
+        Select-Object Name, VmSize, Count, MinCount, MaxCount,
+            EnableAutoScaling, Mode, OrchestratorVersion, ProvisioningState |
+        Format-Table -AutoSize
+}`)}<div class="panel panel-warning"><strong>Note:</strong> <code>Import-AzAksCredential</code> changes your local kubeconfig. Keep that as a deliberate, separate step from this read-only tour.</div>`)}
+    ${section("functions", "4. Azure Functions and App Service plans", `<p>Functions run on App Service infrastructure. Start with the app inventory, then inspect its plan and deployment slots.</p>${code(`$functionApps = if ($resourceGroup) {
+    Get-AzFunctionApp -ResourceGroupName $resourceGroup
+} else {
+    Get-AzFunctionApp
+}
+
+$functionApps |
+    Select-Object Name, ResourceGroupName, Location, State, Kind,
+        DefaultHostName, Runtime, RuntimeVersion |
+    Format-Table -AutoSize
+
+Get-AzAppServicePlan |
+    Select-Object Name, ResourceGroup, Location, Status, Tier, Sku,
+        NumberOfWorkers, MaximumNumberOfWorkers |
+    Format-Table -AutoSize
+
+foreach ($app in $functionApps) {
+    Get-AzWebAppSlot -ResourceGroupName $app.ResourceGroupName \\
+        -Name $app.Name |
+        Select-Object Name, Slot, State, DefaultHostName |
+        Format-Table -AutoSize
+}`)}`)}
+    ${section("network", "5. Virtual networks, subnets, NSGs, and routes", `<p>This is the core network map: address spaces, subnet attachments, security boundaries, and custom routes.</p>${code(`Get-AzVirtualNetwork |
+    Select-Object Name, ResourceGroupName, Location, AddressSpace,
+        DnsServer, EnableDdosProtection |
+    Format-Table -AutoSize
+
+foreach ($vnet in Get-AzVirtualNetwork) {
+    Write-Host "\`n=== VNet: $($vnet.Name) ===" -ForegroundColor Cyan
+    $vnet.Subnets |
+        Select-Object Name, AddressPrefix, NetworkSecurityGroup,
+            RouteTable, NatGateway, ServiceEndpoints, Delegations |
+        Format-Table -AutoSize
+}
+
+foreach ($nsg in Get-AzNetworkSecurityGroup) {
+    Write-Host "\`n=== NSG: $($nsg.Name) ===" -ForegroundColor Cyan
+    $nsg.SecurityRules |
+        Select-Object Name, Priority, Direction, Access, Protocol,
+            SourceAddressPrefix, DestinationAddressPrefix, DestinationPortRange |
+        Sort-Object Direction, Priority |
+        Format-Table -AutoSize
+}
+
+Get-AzRouteTable |
+    Select-Object Name, ResourceGroupName, Location,
+        DisableBgpRoutePropagation |
+    Format-Table -AutoSize`)}`)}
+    ${section("edge", "6. Load balancers and ingress", `<p>Compare the public entry points with their backends, health probes, and frontend addresses.</p>${code(`Get-AzLoadBalancer |
+    Select-Object Name, ResourceGroupName, Location, Sku,
+        FrontendIpConfigurations, BackendAddressPools,
+        LoadBalancingRules, Probes |
+    Format-List
+
+Get-AzPublicIpAddress |
+    Select-Object Name, ResourceGroupName, Location, AllocationMethod,
+        Sku, IpAddress, DnsSettings, AssociatedResourceId |
+    Format-Table -AutoSize
+
+Get-AzApplicationGateway |
+    Select-Object Name, ResourceGroupName, Location, Sku,
+        BackendAddressPools, HttpListeners, RequestRoutingRules, Probes |
+    Format-List
+
+Get-AzPrivateEndpoint |
+    Select-Object Name, ResourceGroupName, Location, ProvisioningState,
+        PrivateLinkServiceConnections, NetworkInterfaces |
+    Format-Table -AutoSize`)}`)}
+    ${section("data", "7. Storage accounts and SQL Managed Instances", `<p>For storage, check TLS, public access, network exposure, and hierarchical namespace. For SQL MI, check sizing, tier, endpoint, subnet, and databases.</p>${code(`Get-AzStorageAccount |
+    Select-Object StorageAccountName, ResourceGroupName, Location, Kind, Sku,
+        AccessTier, EnableHttpsTrafficOnly, MinimumTlsVersion,
+        AllowBlobPublicAccess, EnableHns, PublicNetworkAccess |
+    Format-Table -AutoSize
+
+Get-AzSqlInstance |
+    Select-Object Name, ResourceGroupName, Location, State,
+        FullyQualifiedDomainName, LicenseType, VCore, StorageSizeInGB,
+        ServiceTier, SubnetId, PublicDataEndpointEnabled |
+    Format-Table -AutoSize
+
+foreach ($mi in Get-AzSqlInstance) {
+    Write-Host "\`n=== SQL MI: $($mi.Name) ===" -ForegroundColor Cyan
+    Get-AzSqlInstanceDatabase -ResourceGroupName $mi.ResourceGroupName \\
+        -InstanceName $mi.Name |
+        Select-Object Name, Status, Collation, StorageSizeInGB, CreationDate |
+        Format-Table -AutoSize
+}`)}`)}
+    ${section("observability", "8. Registry, monitoring, and diagnostics", `<p>These services often explain how workloads are deployed and how failures are observed.</p>${code(`Get-AzContainerRegistry |
+    Select-Object Name, ResourceGroupName, Location, Sku, LoginServer,
+        AdminUserEnabled, PublicNetworkAccess |
+    Format-Table -AutoSize
+
+Get-AzOperationalInsightsWorkspace |
+    Select-Object Name, ResourceGroupName, Location, Sku, RetentionInDays,
+        PublicNetworkAccessForIngestion, PublicNetworkAccessForQuery |
+    Format-Table -AutoSize
+
+Get-AzApplicationInsights |
+    Select-Object Name, ResourceGroupName, Location, ApplicationType,
+        WorkspaceResourceId |
+    Format-Table -AutoSize
+
+Get-AzActivityLog -StartTime (Get-Date).AddDays(-7) |
+    Select-Object EventTimestamp, Caller, OperationName, Status,
+        ResourceGroupName |
+    Sort-Object EventTimestamp -Descending |
+    Format-Table -AutoSize`)}`)}
+    ${section("changes", "9. Azure change history", `<p>Use the Activity Log for subscription-level operations, and Azure Resource Graph Change Analysis for resource configuration changes. Both are read-only views. Activity Log retention and Change Analysis availability can vary by resource and subscription.</p>${code(`$since = (Get-Date).AddDays(-7)
+
+# Subscription activity and control-plane operations
+Get-AzActivityLog -StartTime $since |
+    Select-Object EventTimestamp, Caller, OperationName, Status,
+        ResourceGroupName, ResourceId |
+    Sort-Object EventTimestamp -Descending |
+    Format-Table -AutoSize
+
+# Resource configuration changes through Azure Resource Graph
+Install-Module Az.ResourceGraph -Scope CurrentUser -Force
+
+Search-AzGraph -Query @"
+resourcechanges
+| where properties.changeAttributes.timestamp > ago(7d)
+| project Timestamp = todatetime(properties.changeAttributes.timestamp),
+    ChangeType = tostring(properties.changeAttributes.changeType),
+    ChangedBy = tostring(properties.changeAttributes.changedBy),
+    TargetResourceId = tostring(properties.targetResourceId)
+| order by Timestamp desc
+"@ |
+    Select-Object Timestamp, ChangeType, ChangedBy, TargetResourceId |
+    Format-Table -Wrap -AutoSize`)}`)}
+    ${section("billing", "10. Billing and cost", `<p>These commands show usage, estimated charges, budgets, and price-sheet information. Billing data requires appropriate Cost Management or billing-reader permissions, and availability depends on the subscription agreement and offer type.</p><div class="panel panel-warning"><strong>Permissions:</strong> you may need Cost Management Reader, Billing Reader, or a comparable billing-scope role. The commands do not change budgets or billing settings.</div>${code(`Install-Module Az.Billing -Scope CurrentUser -Force
+
+$start = (Get-Date).Date.AddDays(-30)
+$end = (Get-Date).Date
+
+# Usage and estimated charges for the last 30 days
+Get-AzConsumptionUsageDetail -StartDate $start -EndDate $end |
+    Select-Object UsageStart, UsageEnd, InstanceName, ResourceGroup,
+        ResourceLocation, MeterCategory, PretaxCost, Currency |
+    Sort-Object UsageStart -Descending |
+    Format-Table -Wrap -AutoSize
+
+# Roll up usage by resource group and service category
+Get-AzConsumptionUsageDetail -StartDate $start -EndDate $end |
+    Group-Object ResourceGroup, MeterCategory |
+    ForEach-Object {
+        [PSCustomObject]@{
+            ResourceGroup = $_.Group[0].ResourceGroup
+            MeterCategory = $_.Group[0].MeterCategory
+            PretaxCost = ($_.Group | Measure-Object PretaxCost -Sum).Sum
+            Currency = $_.Group[0].Currency
+        }
+    } |
+    Sort-Object PretaxCost -Descending |
+    Format-Table -AutoSize
+
+# Budgets configured at the current subscription scope
+Get-AzConsumptionBudget |
+    Select-Object Name, Amount, TimeGrain, Category, eTag,
+        CurrentSpend, ForecastedSpend, Notifications |
+    Format-List
+
+# Price-sheet entries; this can return a large result set
+Get-AzConsumptionPriceSheet |
+    Select-Object Currency, MeterId, MeterName, MeterCategory,
+        UnitOfMeasure, UnitPrice, ArmRegionName |
+    Format-Table -Wrap -AutoSize`)}`)}
+    ${section("governance", "11. Identity, Key Vault, policy, and tags", `<p>Finish by checking the controls around the resources—not just the resources themselves.</p>${code(`Get-AzKeyVault |
+    Select-Object VaultName, ResourceGroupName, Location, VaultUri,
+        EnableSoftDelete, EnablePurgeProtection, PublicNetworkAccess,
+        EnableRbacAuthorization |
+    Format-Table -AutoSize
+
+Get-AzUserAssignedIdentity |
+    Select-Object Name, ResourceGroupName, Location, ClientId, PrincipalId |
+    Format-Table -AutoSize
+
+Get-AzPolicyAssignment |
+    Select-Object DisplayName, Scope, PolicyDefinitionId |
+    Format-Table -AutoSize
+
+Get-AzResource |
+    Select-Object ResourceGroupName, ResourceType, Name, Location, Tags |
+    Export-Csv .\\azure-resource-inventory.csv -NoTypeInformation`)}`)}
+    <h2 id="resource-graph">12. One useful cross-resource view</h2>
+    <p>Azure Resource Graph is handy when the subscription is large or spans several resource groups.</p>
+    ${code(`Install-Module Az.ResourceGraph -Scope CurrentUser -Force
+
+Search-AzGraph -Query @"
+Resources
+| summarize ResourceCount = count() by type
+| order by ResourceCount desc
+"@ | Format-Table -AutoSize`)}
+    <div class="panel panel-success"><strong>Suggested tour order:</strong> inventory → AKS and Functions → network and ingress → data services → monitoring → governance. Save the inventory CSV before making changes so you have a baseline.</div>`,
+    { toc },
+  );
+}
+
 function blogIndexPage(posts: PostMeta[]): string {
   return pageShell(
     "Blog",
@@ -307,6 +577,10 @@ export async function handlePath(pathname: string, assetRoot: string): Promise<R
 
   if (pathValue === "/health") {
     return textResponse(200, "ok");
+  }
+
+  if (pathValue === "/docs/azure-tour") {
+    return htmlResponse(200, azureTourPage());
   }
 
   if (pathValue === "/blog") {
@@ -441,4 +715,4 @@ export function notFoundPage(): string {
   return pageShell("Not Found", "<h1>404</h1><p>Nothing here.</p>");
 }
 
-export { blogIndexPage, landingPage, resumeDoc, resumePage };
+export { azureTourPage, blogIndexPage, landingPage, resumeDoc, resumePage };
