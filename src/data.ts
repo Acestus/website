@@ -162,7 +162,7 @@ export const resumeVariants: Record<ResumeVariantKey, ResumeVariant> = {
       ["Network Administration", "Routers and firewalls with Infrastructure as Code"],
       ["Security & Compliance", "Backup, disaster recovery, RBAC, SIEM, Entra, FedRAMP"],
     ],
-    certs: ["AZ-500 · AZ-305 · AZ-104 · DP-900", "CKA · CCNA · CompTIA Server+"],
+    certs: ["AZ-104 · AZ-305 · AZ-900", "CCNA · CompTIA Server+"],
     experience: resumeExperience,
   },
   "ai-platform": {
@@ -179,7 +179,7 @@ export const resumeVariants: Record<ResumeVariantKey, ResumeVariant> = {
       ["Operations & Observability", "Incident response, Kusto, Log Analytics, Microsoft Sentinel, SIEM, traces/logs/metrics, rollback, DR, capacity planning, cost optimization"],
       ["Languages & Automation", "Clojure, ClojureScript, Python, JavaScript, PowerShell, Bash, SQL, Linux, containers, networking"],
     ],
-    certs: ["AZ-500 · AZ-305 · AZ-104 · DP-900", "CKA · CCNA · CompTIA Server+"],
+    certs: ["AZ-104 · AZ-305 · AZ-900", "CCNA · CompTIA Server+"],
     experience: resumeExperience,
     projects: [
       {
@@ -217,7 +217,7 @@ export const resumeVariants: Record<ResumeVariantKey, ResumeVariant> = {
       ["Infrastructure & Delivery", "Bicep, ARM templates, CI/CD, GitHub Actions, Kubernetes, Docker, Linux, PowerShell, Bash, SQL"],
       ["Identity & Networking", "Entra ID, MFA, PIM, RBAC, Azure AD Connect, VNETs, subnets, VPN, NSGs, Azure Firewall"],
     ],
-    certs: ["AZ-500 · AZ-305 · AZ-104 · DP-900", "CKA · CCNA · CompTIA Server+"],
+    certs: ["AZ-104 · AZ-305 · AZ-900", "CCNA · CompTIA Server+"],
     experience: resumeExperience,
     projects: [
       {
